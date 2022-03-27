@@ -13,7 +13,7 @@ public class Source {
 		int		columns		= 0;		// Liczba kolumn
 		int[][]	arr;					// Tablica danych
 
-		test_num = sc.nextInt(); 		// Wczytujemy liczbe zestawow
+		test_num = sc.nextInt(); 			// Wczytujemy liczbe zestawow
 		while (test_num-- > 0) { 			// Petla do wczytywania i przetwarzania zestawow
 			// Section Reading input
 			nz = sc.nextInt(); 				// Wczytujemy aktualny numer zestawu

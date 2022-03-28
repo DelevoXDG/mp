@@ -2,6 +2,58 @@
 
 import java.util.Scanner;
 
+// Idea rozwiazania:
+// n.p mamy fragment n=f3 m=5	
+// 0 1 0 0 0
+// 0 -1 2 0 0
+// 0 0 -1 3 0
+
+// Alogorytm dziala w taki sposob
+// Sprawdzamy algorytmem Kadane dla kazdego wiersza wszystkie mozliwe fragmenty, zawierajace ten wiersz i wiersze pod tym wierszem.
+// Jezeli udalo znalezc fragment o wiekszej sumie lub o tej samej sumie, ale mniejszym rozmiarze, zamiename dane najlepszego fragmentu.
+// Przyklad
+// i = 0
+// j = 0)
+// 0 1 0 0 0	-> naljepszy fragment 1	[suma =1]
+// __________
+// 0 1 0 0 0    -> suma[najlepsza suma z kadane = 1]
+// j = 1) 
+// 0 1 0 0 0	-> naljepszy fragment 0	[suma = 2]							  
+// 0 -1 2 0 0 						  2
+// __________
+// 0 0 2 0 0    -> suma[najlepsza suma z kadane = 2]	
+// j = 2)
+// 0 1 0 0 0 	-> naljepszy fragment  0 0 [suma = 4] 
+// 0 -1 2 0 0 						   2 0
+// 0 0 -1 3 0						  -1 3
+// __________
+// 0 0 1 3 0	-> suma[najlepsza suma z kadane = 4]
+
+// i = 1
+// j = 1)
+// 0 -1 2 0 0	-> naljepszy fragment 2 [suma = 2]
+// __________
+// 0 -1 2 0 0	-> suma[najlepsza suma z kadane = 2]
+// j = 2)
+// 0 -1 2 0 0 	-> naljepszy fragment  	2 0  [suma = 4]
+// 0 0 -1 3 0						   -1 3	 [rozmiar mniejszy od [0..2][2..3]]
+// __________
+// 0 -1 1 3 0	-> suma[najlepsza suma z kadane = 4]
+
+// i = 2
+// j = 2)			
+// 0 -1 2 0 0 	-> najlepszy fragment	2
+// __________ 
+// 0 -1 2 0 0 	-> suma[najlepsza suma z kadane = 2]
+
+// Z tego mamy najlepszy fragment [1..2][2..3] o sumie 4
+
+// Mamy 3 petli: 
+// pierwsza przechodzi przez n elementow
+// druga przez (n-1) (n-2) ... elementow
+// trzecia przez n elementow
+// T(n) = O(n^3)
+
 public class Source {
 	public static Scanner sc = new Scanner(System.in); // Scanner do wczytywania danych wejsciowych
 

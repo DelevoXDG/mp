@@ -66,12 +66,10 @@ public class Source {
 	public static int Latest_Idx_LesserThan(int[] arr, int left_i, int right_i, final int searched_Value) {
 		// Modyfikacja algorytmu przeszukiwania binarnego o zlozonosci O(log2(n))
 		// Zamiast znalezenia indeksu elementu o podanej wartosci, algorytm wyszukuje indeks ostatniego wystapenia najwiekszego elementu mniejszego od podanej wartosci 	
-
 		int	result_i	= -1;	// Ostatni indeks najwiekszego elementu mniejszego od podanej wartosci 
 		// Zwracamy -1, jesli nie istneje element mniejszy od podanej wartosci np. wartosc 2 dla tablicy 4 5 8  
 		int	mid_i		= 0;	// Indeks srodkowego elementa w sprawdzanym przedziale tablicy
-
-		while (left_i <= right_i) {
+		while (left_i <= right_i) { // Sprawdzamy zmienjszajacy przedzial poki ten przedzial istneje
 			mid_i = left_i + (right_i - left_i + 1) / 2;// Szukamy sufit jako indeks elementu srodkowego
 			if (arr[mid_i] >= searched_Value) {
 				// Jesli element o indeksie mid_i jest wiekszy badz rowny od podanej wartosci, zachodzi nastepujace zdanie log2iczne:
@@ -86,7 +84,6 @@ public class Source {
 				left_i = mid_i + 1; // Zmieniamy przedzial do przeszukiwania na [mid_i-1, right_i], bo szukamy OSTATNI indeks najwiekszego elementu mniejszego od podanej wartosci 
 			}
 		}
-
 		return result_i; // Zwraca wynik, bedacy indeksem ostatniego wystapienia najwiekszego elementu mniejszego od podanej wartosci
 	}
 
@@ -136,18 +133,18 @@ public class Source {
 					// W taki sposob znajdziemy indeks ostatniego wystapenia elementu, ktory spelnia nierownosc trojkata dla odcinkow arr[i] i arr[j] 
 					int	cur_triangles_count	= third_side_last_i - last_checked_i;    // W taki sposob rowniez uzyskujemy liczbe elementow, ktore spelniaja nierownosc nierownosc trojkata dla odcinkow arr[i] i arr[j] 
 					// Ta liczba jest rowna mozliwych trojkatow dla odcinkow arr[i] i arr[j]
-					// if (cur_triangles_count > 0) { // Jesli liczba mozliwych trojkatow dla odcinkow arr[i] i arr[j] jest wieksza od zera i nie wypisalismy 10 trojek, 
-					// wypisujemy indeksy trojkatow utworzone przez odcinki arr[i] i arr[j] i trzeci odcinek  
-					for (int printed = 0; printed < min(cur_triangles_count, 10 - triangles_count); printed++) { // Petla, wypisujaca indeksy znalezionych trojkatow leksykograficznie
-						// Ta petla wykonuje nie wiecej niz 10 razy zgodnie z trescia, wiec jej zlozonosc asymptomatyczna jest O(1)
-						//jest to realizonane przez funkcje min(), ktora przyjmuje liczbe minimalna wartosc z (liczby mozliwych trojkataw dla odcinkow arr[i] i arr[j],   
-						// Wypisuje trojki w leksykograficznej kolejnosci, ze wzgledu na to, w jaki sposob algorytm przechodzi po elementach tablicy
-						// i in [0, n-1]
-						// 		j in [i, n-1]]
-						//				k in [j+1, j+1+printed]
-						System.out.print("(" + i + "," + j + "," + (j + 1 + printed) + ") "); // Wypisywanie trojek indeksow trojkatow
+					if (cur_triangles_count > 0) { // Jesli liczba mozliwych trojkatow dla odcinkow arr[i] i arr[j] jest wieksza od zera i nie wypisalismy 10 trojek, 
+						// wypisujemy indeksy trojkatow utworzone przez odcinki arr[i] i arr[j] i trzeci odcinek  
+						for (int printed = 0; printed < min(cur_triangles_count, 10 - triangles_count); printed++) { // Petla, wypisujaca indeksy znalezionych trojkatow leksykograficznie
+							// Ta petla wykonuje nie wiecej niz 10 razy zgodnie z trescia, wiec jej zlozonosc asymptomatyczna jest O(1)
+							//jest to realizonane przez funkcje min(), ktora przyjmuje liczbe minimalna wartosc z (liczby mozliwych trojkataw dla odcinkow arr[i] i arr[j],   
+							// Wypisuje trojki w leksykograficznej kolejnosci, ze wzgledu na to, w jaki sposob algorytm przechodzi po elementach tablicy
+							// i in [0, n-1]
+							// 		j in [i, n-1]]
+							//				k in [j+1, j+1+printed]
+							System.out.print("(" + i + "," + j + "," + (j + 1 + printed) + ") "); // Wypisywanie trojek indeksow trojkatow
+						}
 					}
-					// }
 					triangles_count += cur_triangles_count; // Zwiekszamy liczbe wszystkich mozliwych trojkatow dla danego zestawu danych o liczbe mozliwych trojkatow dla odcinkow arr[i] i arr[j]
 				}
 			}
@@ -183,7 +180,7 @@ public class Source {
 // 5
 // 2 5 6 1 7
 
-// test.00.ou
+// test.00.out
 // 1: n= 9
 // 1 2 3 3 3 3 5 7 8 
 // (0,2,3) (0,2,4) (0,2,5) (0,3,4) (0,3,5) (0,4,5) (1,2,3) (1,2,4) (1,2,5) (1,3,4) 

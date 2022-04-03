@@ -3,8 +3,14 @@
 import java.util.Scanner;
 
 // Idea rozwiazania:
-// pending
-
+// Rozwizanie opera sie na algorytm konwersji z INF do ONP i odwrotnie przedstawiony na wykladzie MP oraz na przedmiocie WDI w pierwszym semestrze
+// Rozwiazanie wynokuje konwersje wyrazen z INF do ONP i naodwrot, oraz sprawdza poprawnosc wyrazen:
+// 1) Dla INF-> ONP sprawdzany jest wynik sknoczonego automatu deterministycznego oraz poprawnosc uzywania nawiasow
+// 2) Dla ONP-> spradzana jest wykonalnosc wyrazenia
+// Dla rozwiazania tego zadania zostaly zimplemetowane:
+// 1) Stos typu char
+// 2) Stos typu String
+// 3) Symulator sknoczonego automatu deterministycznego
 // Section code itself
 class String_Stack {		// Implementacja stosu typu String
 	private String[] arr;	// Tablica, przechowywujacy elementy stosu
@@ -12,7 +18,7 @@ class String_Stack {		// Implementacja stosu typu String
 
 	public String_Stack(final int maxSize) {	// Konstruktor stosu
 		arr = new String[maxSize];				// Przyjmuje maksymalny rozmiar stosu
-		size = 0;
+		size = 0;								// Ustawiamy aktualny rozmiar stosu
 	}
 	public void push(final String data) {		// Dodawanie elementow do stosu
 		if (size + 1 >= arr.length) {
@@ -59,7 +65,7 @@ class Char_Stack {			// Implementacja stosu typu String
 
 	public Char_Stack(final int maxSize) {		// Konstruktor stosu
 		arr = new char[maxSize];				// Przyjmuje maksymalny rozmiar stosu
-		size = 0;
+		size = 0;								// Ustawiamy aktualny rozmiar stosu
 	}
 	public void push(final char data) {			// Dodawanie elementow do stosu
 		if (size + 1 >= arr.length) {
@@ -117,7 +123,7 @@ public class Source {
 				q0(false),
 				q1(true),	// Akceptujacy stan
 				q2(false),
-				err(false);	// Stan bledu, odrazu mozemy zatrzymac SAD 
+				err(false);	// Stan bledu, mozemy zatrzymac automat 
 
 				final boolean isAcceptable;	// Czy jest poprawnym stanem wyjsciowym
 				State(boolean expr) {		// Konstruktor Stanu
@@ -132,7 +138,7 @@ public class Source {
 
 				static {
 					// Tabelka stanow automatu skonczonego
-					// Jezeli nie wskazanego przejcia, automat zmienia stan na err
+					// Jezeli nie wskazanego przejscia, automat zmienia stan na err
 					// err - stan bledu, ocznacza, ze automat juz napewny nie zaakceptuje slowo
 
 					// Stan q0
@@ -202,7 +208,7 @@ public class Source {
 		private static boolean isCorrectRPNSymbol(char symbol) {	// Sprawdza, czy symbol jest poprawnym symbolem dla postaci ONP
 			return ("~!^*/%+-<>?&|=".contains(String.valueOf(symbol))) || isOperand(symbol);
 		}
-		private static int getPriority(char OR) {	// Zwraca priorytet wskazanego symbola 
+		private static int getPriority(char OR) {	// Zwraca priorytet wskazanego symbola zgodnie z trescia
 			if (OR == 'Z') return 20;				// Z ocznacza Operand, uzywany jest dla konwersju ONP->INF 
 			if (OR == '(') return 10;
 			if (OR == ')') return 10;
@@ -234,21 +240,21 @@ public class Source {
 			int				leftPar_count	= 0;	// Licznik lewych nawiasow
 			int				rightPar_count	= 0;	// Licznik prawych nawiasow 
 
-			NotDFA.State	autoState		= NotDFA.State.q0;	// Inicjalizacja poczatkowego stanu skonczonego automatu deterministycznego 
+			NotDFA.State	automatState	= NotDFA.State.q0;	// Inicjalizacja poczatkowego stanu skonczonego automatu deterministycznego 
 
-			for (int i = 0; i < infStr.length(); i++) {
+			for (int i = 0; i < infStr.length(); i++) {	// Petla przechodzi przez wszystkie elementy wyrazenia INF
 				char sym = infStr.charAt(i);		// Aktualnie sprawdzany symbol z wyrazenia INF
 				if (isCorrectINFSymbol(sym)) {		// Sprawdzamy, czy symbol jest poprawnym symbolem dla alfabetu INF
 					if (isOperand(sym)) {			// Sprawdzamy, czy symobol jest operandem
-						autoState = autoState.readNext("z");  // Wczytalismy operand, odpowednia zmiana stanu skonczonego automatu deterministycznego 
+						automatState = automatState.readNext("z");  // Wczytalismy operand, odpowednia zmiana stanu skonczonego automatu deterministycznego 
 						result.push(sym);					  // Dodajemy operator na wyjsciowy stos
 					} else if (sym == '(') {
-						autoState = autoState.readNext("(");  // Wczytalismy lewy nawias, odpowednia zmiana stanu skonczonego automatu deterministycznego 
+						automatState = automatState.readNext("(");  // Wczytalismy lewy nawias, odpowednia zmiana stanu skonczonego automatu deterministycznego 
 						leftPar_count++;					  // Inkrementacja liczniku lewych nawiasow
 
 						stack.push(sym);					  // Dodajemy lewy nawias na stos
 					} else if (sym == ')') {
-						autoState = autoState.readNext(")");  // Wczytalismy prawy nawias, odpowednia zmiana stanu skonczonego automatu deterministycznego 	
+						automatState = automatState.readNext(")");  // Wczytalismy prawy nawias, odpowednia zmiana stanu skonczonego automatu deterministycznego 	
 						rightPar_count++;					  // Inkrementacja liczniku prawych nawiasow
 
 						while (stack.NonEmpty() && stack.peek() != '(') {	// Zdejmujemy operatory do napotkania lewego nawiasu lub skonczenia elementow na stosie
@@ -262,128 +268,121 @@ public class Source {
 					} else if (isOperator(sym)) {// Sprawdzamy, czy symobol jest operatorem
 						if (isRightSide(sym)) {	// Czy operator jest prawostronnie laczny
 							if (isUnary(sym)) {	// Sprawdzamy, czy symbol jest operatorem jednostronnym
-								autoState = autoState.readNext("o1");  // Wczytalismy operator jednoargumentowy, odpowednia zmiana stanu skonczonego automatu deterministycznego
+								automatState = automatState.readNext("o1");  // Wczytalismy operator jednoargumentowy, odpowednia zmiana stanu skonczonego automatu deterministycznego
 							} else {
-								autoState = autoState.readNext("o2");  // Wczytalismy operator dwuargumentowy, odpowednia zmiana stanu skonczonego automatu deterministycznego
+								automatState = automatState.readNext("o2");  // Wczytalismy operator dwuargumentowy, odpowednia zmiana stanu skonczonego automatu deterministycznego
 							}
 							while (stack.NonEmpty() && stack.peek() != '('   // Zdejmujemy ze stosu do napotkania operatora o mniejszym badz rownym od aktualnego priorytecie lub skonczenia elementow na stosie
 									&& getPriority(stack.peek()) > getPriority(sym)) {	// operatory o priorytecie wiekszym niz u aktualnego symbolu
-								result.push(stack.pop());																// I podajemy te operatory na wyjscie
+								result.push(stack.pop());								// I podajemy te operatory na wyjscie
 							}
 						} else {// Napotkany lewostronnie laczny operator
 							// binary_OR_count++;
-							autoState = autoState.readNext("o2");	 		// Wczytalismy operator dwuargumentowy, odpowednia zmiana stanu skonczonego automatu deterministycznego
+							automatState = automatState.readNext("o2");	 		// Wczytalismy operator dwuargumentowy, odpowednia zmiana stanu skonczonego automatu deterministycznego
 
 							while (stack.NonEmpty() && stack.peek() != '(' &&		// Zdejmujemy ze stosu do napotkania operatora o mniejszym od aktualnego priorytecie lub skonczenia elementow na stosie
 									getPriority(stack.peek()) >= getPriority(sym)) {  	// operatory o priorytecie nie mniejszym niz u aktualnego symbolu
 								result.push(stack.pop());								// I podajemy te operatory na wyjscie
 							}
 						}
-						stack.push(sym);									// Dodajemy na stos aktualny operator
+						stack.push(sym);										// Dodajemy na stos aktualny operator
 					} else {
 						throw new IllegalArgumentException("Unknown symbol detected");	// Nie znany symbol (nie powinno zdarzyc)
 					}
 
-					if (autoState.hasError() || leftPar_count != rightPar_count) {
-						return "error";
+					if (automatState.hasError()) { // Sprawdzamy, czy automatu skonczony nie jest w stanie bledu
+						return "error";			// Jezeli jest, mamy niepoprwawne wyrazenie INF
 					}
 				}
 
 			}
-			if (autoState.isAcceptable == false || leftPar_count != rightPar_count) {
-				return "error";
+			if (automatState.isAcceptable == false || leftPar_count != rightPar_count) {	// Sprawdzamy, czy automat skonczyl w stanie 1 i czy jest poprawna liczba nawiasow
+				return "error"; // Jezeli nie, mamy niepoprwawne wyrazenie INF
 			}
-			while (stack.NonEmpty()) {
+			while (stack.NonEmpty()) {	// Podajemy na wyscie reszte operatorow ze stosu
 				result.push(stack.pop());
 			}
 
-			return result.toString();
+			return result.toString();	// Zwracamy wynik w ONP
 		}
 
-		public static String infParse(String rpnStr) {
+		public static String infParse(String rpnStr) {		// Konwersja z ONP do INF, zwraca string w postaci INF
 			String_Stack	result			= new String_Stack(rpnStr.length());
-			Char_Stack		outline_stack	= new Char_Stack(rpnStr.length());	// Stos, zawierajacy operandy lub ostatnie najwieksze orerator dla wykonanych obliczen 
-			// int				OP_count		= 0;
-			// int				OR_count		= 0;
+			Char_Stack		outline_stack	= new Char_Stack(rpnStr.length());		// Stos, zawierajacy operandy lub operator ostatnie wykonanego dzialania 
 
-			for (int i = 0; i < rpnStr.length(); i++) {
-				char sym = rpnStr.charAt(i);
-				if (isCorrectRPNSymbol(sym)) {
-					if (isOperand(sym)) {
-						// OP_count++;
-						outline_stack.push('Z');		// symbol oznaczajacy operand
-						result.push(String.valueOf(sym));
-					} else if (isOperator(sym)) {
-						// OR_count++;
-						if (isUnary(sym)) {
-							if (outline_stack.isEmpty()) {
-								return "error";
+			for (int i = 0; i < rpnStr.length(); i++) {				// Petla przechodzi przez wszystkie elementy wyrazenia ONP
+				char sym = rpnStr.charAt(i);// Aktualnie sprawdzany symbol z wyrazenia INF
+				if (isCorrectRPNSymbol(sym)) {	 	 	 	 // Sprawdzamy, czy symbol jest poprawnym symbolem dla alfabetu ONP
+					if (isOperand(sym)) {					// Sprawdzamy, czy symobol jest operandem
+						outline_stack.push('Z');			// Dodajemy na outline stos symbol oznaczajacy operand
+						result.push(String.valueOf(sym));	// Dodajemy na stos wynikowy operand 
+					} else if (isOperator(sym)) { // Sprawdzamy, czy symbol jest operatorem
+						if (isUnary(sym)) {	// Sprawdzamy, czy symbol jest operatorem jednoargumentowym
+							if (outline_stack.isEmpty()) {	// Sprawdzamy, czy stos jest pusty
+								return "error";				// Nie mozemy wtedy pobrac z niego ostatni element
+								// Zatem mamy niewykonalne wyrazenie ONP
 							}
 							char	prevOutline	= outline_stack.pop();
 							String	prevExpr	= result.pop();
 
-							if (getPriority(prevOutline) < getPriority(sym)) {
-								prevExpr = encloseInBrackets(prevExpr);
+							if (getPriority(prevOutline) < getPriority(sym)) { //  Jezeli operator o najmniejszuym priorytecie dla poprzednego wyrazenie jest mniejszy, niz priorytet aktualnego operatora 
+								prevExpr = encloseInBrackets(prevExpr);			// Bierzemy to wyrazenie w nawiasy 
 							}
 
 							outline_stack.push(sym);
-							result.push(sym + " " + prevExpr);
-						} else { // is binary 
+							result.push(sym + " " + prevExpr); // Podajemy na wyscie zaktualizowane wyrazenie z nowym operatorem
+						} else { // symbol jest operatorem dwuargumentowym
 							if (outline_stack.size() < 2) {
+								// Nie mozemy wtedy pobrac z niego dwa ostatnie elementy
+								// Zatem mamy niewykonalne wyrazenie ONP
 								return "error";
 							}
+							// Pobranie dwuch ostatnich wyrazen w raz z ich operatorami o najmniejszym priorytecie
 							char	prevOB	= outline_stack.pop();
 							char	prevOA	= outline_stack.pop();
 							String	prevB	= result.pop();
 							String	prevA	= result.pop();
 
-							if (getPriority(sym) > getPriority(prevOA)) {
-								prevA = encloseInBrackets(prevA);
+							if (getPriority(prevOA) < getPriority(sym)) { //  Jezeli operator o najmniejszuym priorytecie dla poprzednego lewego wyrazenie jest mniejszy, niz priorytet aktualnego operatora
+								prevA = encloseInBrackets(prevA);// Bierzemy to wyrazenie w nawiasy 
 							}
-							if (getPriority(sym) > getPriority(prevOB)) {
-								prevB = encloseInBrackets(prevB);
-							} else if (isRightSide(sym) == false && getPriority(sym) == getPriority(prevOB)) {
-								prevB = encloseInBrackets(prevB);
+							if (getPriority(prevOB) < getPriority(sym)) {  //  Jezeli operator o najmniejszuym priorytecie dla poprzednego prawego wyrazenia jest mniejszy, niz priorytet aktualnego operatora
+								prevB = encloseInBrackets(prevB);  // Bierzemy to wyrazenie w nawiasy 
+							} else if (isRightSide(sym) == false && getPriority(prevOB) == getPriority(sym)) { //  Jezeli operator o najmniejszuym priorytecie dla poprzednego prawego wyrazenia jest rowny priorytetowi aktualnego operatora
+								prevB = encloseInBrackets(prevB);  // Bierzemy to wyrazenie w nawiasy 
 							}
 
 							outline_stack.push(sym);
-							result.push(prevA + " " + sym + " " + prevB);
+							result.push(prevA + " " + sym + " " + prevB);	// Podajemy na wysjcie nowe wyrazanie z poprzednich dwuch
 						}
 					} else {
-						throw new IllegalArgumentException("Unknown symbol");
+						throw new IllegalArgumentException("Unknown symbol");	// Nie powinno zdarzyc
 					}
 				}
 
 			}
-
-			if (result.size() != 1) {
-				return "error";
+			if (result.size() != 1) { // Musimy dostac jedny element na stosie wynikowym. Ten element bedzie wyrazeniem w INF
+				return "error"; // W przeciwnym przyadku mamy niewykonalne wyrazenie ONP	
 			}
-
-			return result.toString();
+			return result.toString();	// Zwracamy wynik w INF
 		}
 
 	}
 	public static void main(String[] args) {
 		int test_count = sc.nextInt();	// Liczba sprawdzanych zestawow
 
-		while (test_count-- > 0) {
-			String	inputType	= sc.next();
-			String	inputStr	= sc.nextLine();
-			if (inputType.charAt(0) == 'I') { // INF do ONP
-				System.out.println("ONP: " + rpn.rpnParse(inputStr));
-			} else {						 // ONP do INF
-				System.out.println("INF: " + rpn.infParse(inputStr));
+		while (test_count-- > 0) {	// Petla przechodzi przez wszystkie zestawy
+			String	inputType	= sc.next();	// Wczytuje postac INF lub ONP
+			String	inputStr	= sc.nextLine();// Wyrazenie do konwersji
+			if (inputType.charAt(0) == 'I') { // Konwesja INF do ONP
+				System.out.println("ONP: " + rpn.rpnParse(inputStr));	// Zparsowany wynik
+			} else {						 // Konwerja ONP do INF
+				System.out.println("INF: " + rpn.infParse(inputStr));	// Zparsowany wynik
 			}
 		}
 	}
 }
 
-// Pytania:
-// [x] replaceAll()
-// [x] Stan automatu
-
-// Testy
 // test.00.in
 // 10
 // ONP: xa_b+cd/e-?=
@@ -396,6 +395,7 @@ public class Source {
 // INF: a*(~b)
 // INF: x=$(`a+b)?(c/`d -e)
 // ONP: 44c a<x >b ~ =
+
 // test.00.out
 // INF: x = a + b ? c / d - e
 // INF: b ? o - t = m < e < k = n ^ ( u + l * l )

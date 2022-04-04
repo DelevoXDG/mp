@@ -67,6 +67,9 @@ replay_pid*
 # Tests
 **[Tt]ests/
 
+# Selective unignore
+!P03/tests/
+
 #Selective ignore
 labs/
 *.settings/

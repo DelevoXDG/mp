@@ -1,0 +1,20 @@
+ONP: a b + a ~ a - + 
+ONP: a b + a ~ a - + 
+ONP: x a ~ ~ b c * + = 
+ONP: t a ~ x < b ~ < = 
+ONP: a ~ b ~ ~ - c d + < p ! & q ! ! | 
+ONP: error 
+ONP: x a ~ b * c / d - e f ~ % + = 
+ONP: x a b c ^ ^ = 
+ONP: a b c * + 
+ONP: x a b c d e ^ ^ = = = 
+INF: a * ( b - c ) 
+INF: error 
+INF: a 
+INF: a * b * ( c * d ) 
+INF: a + b + ( ~ a - a ) 
+INF: a + b + ( c + d ) 
+INF: a / b * c 
+INF: error 
+INF: ( a + ( b - c ) ) / d ^ e 
+INF: x = a * ( b * c ) 

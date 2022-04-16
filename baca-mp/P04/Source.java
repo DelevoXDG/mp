@@ -32,13 +32,13 @@ class Car {
 	public void hookPrev(Car prev) {
 		_prev = prev;
 	}
+
 }
 
 class Train {
 	private String _name;
 	private Train _next;
 	private Car _first;
-	private Car _last;
 
 	public Train(String trainName, String carName, Train next) {
 		this._name = trainName;
@@ -57,30 +57,44 @@ class Train {
 	public String getName() {
 		return _name;
 	}
+	public Train getNext() {
+		return _next;
+	}
+	public void hookNext(Train next) {
+		_next = next;
+	}
 	public String getCars() {
 		String	carListString	= "";
 		Car		curCar			= this._first;
 		Car		prevCar			= null;
 		do {
 			carListString += " " + curCar.getName();
-			if (curCar._next == prevCar) {
+			if (curCar.getNext() == prevCar) {
 				prevCar = curCar;
-				curCar = curCar._prev;
+				curCar = curCar.getPrev();
 			} else {
 				prevCar = curCar;
-				curCar = curCar._next;
+				curCar = curCar.getNext();
 			}
 		} while (curCar != this._first);
 
 		return carListString;
 	}
+	public Car getLast() {
+		return this._first.getPrev();
+	}
 	public void insertLastCar(String carName) {
-		Car insertedCar = new Car(carName, this._first._prev, this._first);
-		this._first._prev._next = insertedCar;
-		this._first._prev = insertedCar;
+		Car insertedCar = new Car(carName, this.getLast(), this._first);
+		this.getLast().hookNext(insertedCar);
+		this._first.hookPrev(insertedCar);
+	}
+	public void reverse() {
+		_first = getLast();
+		_first.hookNext(null);
 	}
 }
 
+// Section List
 class TrainList {
 	private Train _trains;
 
@@ -91,7 +105,7 @@ class TrainList {
 		this._trains = train;
 	}
 	public Train findTrain(String trainName) {
-		for (Train curTrain = _trainList._trains; curTrain != null; curTrain = curTrain._next) {
+		for (Train curTrain = this._trains; curTrain != null; curTrain = curTrain.getNext()) {
 			if (curTrain.isEqual(trainName)) {
 				return curTrain;
 			}
@@ -123,16 +137,24 @@ class TrainList {
 	public void printCarList(String trainName) {
 		String	carList		= "";
 		Train	curTrain	= findTrain(trainName);
-		if (curTrain == null) {
+		if (curTrain != null) {
+			carList += curTrain.getName() + ":" + curTrain.getCars();
+			System.out.println(carList);
+		} else {
 			Error.printError(Error.trainNotExists, trainName);
-			return;
 		}
-		carList += curTrain.getName() + ":" + curTrain.getCars();
-		System.out.println(carList);
+	}
+	public void Reverse(String trainName) {
+		Train curTrain = findTrain(trainName);
+		if (curTrain != null) {
+			curTrain.reverse();
+		} else {
+			Error.printError(Error.trainNotExists, trainName);
+		}
 	}
 }
 
-public static enum Error {
+enum Error {
 	trainExists,
 	trainNotExists;
 
@@ -157,8 +179,8 @@ public class Source {
 	public static void main(String[] args) {
 		int test_count = 0;
 		test_count = sc.nextInt();
-		TrainStation station = new TrainStation();
-
+		// TrainStation station = new TrainStation();
+		TrainList trainList = new TrainList();
 		while (test_count-- > 0) {
 			int OP_count = sc.nextInt();
 			while (OP_count-- > 0) {
@@ -168,32 +190,34 @@ public class Source {
 					String	trainName	= sc.next();
 					String	carName		= sc.next();
 
-					station.New(trainName, carName);
+					trainList.newTrain(trainName, carName);
 					break;
 				}
 				case "InsertFirst": {
 					String	trainName	= sc.next();
 					String	carName		= sc.next();
 
-					station.InsertFirst(trainName, carName);
+					// trainList.insertFirst(trainName, carName);
 					break;
 				}
 				case "InsertLast": {
 					String	trainName	= sc.next();
 					String	carName		= sc.next();
 
-					station.InsertLast(trainName, carName);
+					trainList.insertLast(trainName, carName);
 					break;
 				}
 				case "Display": {
 					String trainName = sc.next();
-					station.Display(trainName);
+					trainList.printCarList(trainName);
 					break;
 				}
 				case "Trains": {
 					break;
 				}
 				case "Reverse": {
+					String trainName = sc.next();
+					trainList.Reverse(trainName);
 					break;
 				}
 				case "Union": {

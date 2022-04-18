@@ -11,6 +11,7 @@ import java.util.Scanner;
 // 1) Stos typu char
 // 2) Stos typu String
 // 3) Symulator sknoczonego automatu deterministycznego
+/// Wykorzystana tylko jedna petla zalezna od rozmiaru danych, zatem zlozonosc mamy O(n)
 // Section code itself
 class String_Stack {		// Implementacja stosu typu String
 	private String[] arr;	// Tablica, przechowywujacy elementy stosu

@@ -69,6 +69,7 @@ replay_pid*
 
 # Selective unignore
 !P03/tests/
+!P04/tests/
 
 #Selective ignore
 labs/

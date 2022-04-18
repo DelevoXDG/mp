@@ -1,80 +1,80 @@
-ONP: Error
+ONP: error
 INF: a + b + ( ~ a - a )
-ONP: a b + a ~ a - +
-ONP: x a ~ ~ b c * + =
-ONP: t a ~ x < b ~ < =
-ONP: a ~ b ~ ~ - c d + < p ! & q ! ! |
-ONP: Error
-ONP: x a ~ b * c / d - e f ~ % + =
+ONP: a b + a ~ a - + 
+ONP: x a ~ ~ b c * + = 
+ONP: t a ~ x < b ~ < = 
+ONP: a ~ b ~ ~ - c d + < p ! & q ! ! | 
+ONP: error
+ONP: x a ~ b * c / d - e f ~ % + = 
 INF: x = a + ( b + ( c + ( d + ( e + ( f + g ) ) ) ) )
 INF: a + b + c + d + e + f + g
 INF: a + ( b + c ) + ( d + ( e + f ) + g )
-INF: Error
-ONP: x a b c = = =
+INF: error
+ONP: x a b c = = = 
 INF: x = a = b = c
-ONP: x a b c ^ ^ =
-ONP: x a b c d e ^ ^ = = =
+ONP: x a b c ^ ^ = 
+ONP: x a b c d e ^ ^ = = = 
 INF: x = a = b = c ^ d ^ e
-ONP: x a b c d e ^ ^ = = =
+ONP: x a b c d e ^ ^ = = = 
 INF: x = ~ ~ ~ ~ ~ ~ a
-ONP: x a ~ ~ ~ ~ =
-ONP: x a ~ ~ ~ ~ =
+ONP: x a ~ ~ ~ ~ = 
+ONP: x a ~ ~ ~ ~ = 
 INF: x = ~ ~ ~ ~ a
-ONP: x a b c - d + + =
+ONP: x a b c - d + + = 
 INF: x = a + ( b - c + d )
-ONP: x a a b - c + + =
+ONP: x a a b - c + + = 
 INF: x = a + ( a - b + c )
-ONP: Error
+ONP: error
 INF: a + b + ( ~ a - a )
-ONP: a b + a ~ a - +
-ONP: x a ~ ~ b c * + =
-ONP: t a ~ x < b ~ < =
-ONP: a ~ b ~ ~ - c d + < p ! & q ! ! |
-ONP: Error
-ONP: x a ~ b * c / d - e f ~ % + =
+ONP: a b + a ~ a - + 
+ONP: x a ~ ~ b c * + = 
+ONP: t a ~ x < b ~ < = 
+ONP: a ~ b ~ ~ - c d + < p ! & q ! ! | 
+ONP: error
+ONP: x a ~ b * c / d - e f ~ % + = 
 INF: x = a + ( b + ( c + ( d + ( e + ( f + g ) ) ) ) )
 INF: a + b + c + d + e + f + g
 INF: a + ( b + c ) + ( d + ( e + f ) + g )
-INF: Error
-ONP: x a b c = = =
+INF: error
+ONP: x a b c = = = 
 INF: x = a = b = c
-ONP: x a b c ^ ^ =
-ONP: x a b c d e ^ ^ = = =
+ONP: x a b c ^ ^ = 
+ONP: x a b c d e ^ ^ = = = 
 INF: x = a = b = c ^ d ^ e
-ONP: x a b c d e ^ ^ = = =
-INF: Error
-ONP: Error
-ONP: a b + c * d a - f b - * +
-ONP: a ~ ~ ~
+ONP: x a b c d e ^ ^ = = = 
+INF: error
+ONP: error
+ONP: a b + c * d a - f b - * + 
+ONP: a ~ ~ ~ 
 INF: ( a + b ) * c + ( d - a ) * ( f - b )
 INF: a * b * c * d * e
 INF: a * ( b * c )
 INF: ( a < b ) / c + d
-ONP: Error
+ONP: error
 INF: ~ ~ ~ a
-INF: Error
-ONP: a ~ b ~ c ~ + * d ~ e - ~ /
+INF: error
+ONP: a ~ b ~ c ~ + * d ~ e - ~ / 
 INF: a * ( ~ b + c ) / ~ ( d - e )
-ONP: Error
-ONP: Error
-INF: Error
-INF: Error
-ONP: Error
-ONP: a b + c * d a - f b - * +
-ONP: a b * c * d * e *
+ONP: error
+ONP: error
+INF: error
+INF: error
+ONP: error
+ONP: a b + c * d a - f b - * + 
+ONP: a b * c * d * e * 
 INF: ( a + b ) * c + ( d - a ) * ( f - b )
 INF: a * b * c * d * e
 INF: a * ( b * c )
 INF: a * b / ( c * d )
-ONP: a ~ b c d ^ * /
+ONP: a ~ b c d ^ * / 
 INF: ~ ~ ~ a
-ONP: a ~ ~ ~
+ONP: a ~ ~ ~ 
 INF: ( a + b ) ^ ( c % d )
-ONP: a b ~ c + * d e - ~ /
+ONP: a b ~ c + * d e - ~ / 
 INF: a * ( ~ b + c ) / ~ ( d - e )
 INF: a * b / ( c % d )
-ONP: a x < b <
-ONP: a x b < =
-ONP: x a > x b < +
-ONP: a b c * +
+ONP: a x < b < 
+ONP: a x b < = 
+ONP: x a > x b < + 
+ONP: a b c * + 
 INF: a + b * c

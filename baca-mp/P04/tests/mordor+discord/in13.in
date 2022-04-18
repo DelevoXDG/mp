@@ -1,0 +1,23 @@
+1
+21
+New T1 1q
+DelLast T1 T2
+DelFirst T2 T1
+Display T1
+Display T2
+Display T3
+Display T4
+InsertFirst T1 w2
+Display T1
+Display T2
+Display T3
+Display T4
+Trains
+DelLast T1 T3
+Trains
+DelFirst T1 T4
+Trains
+Display T1
+Display T2
+Display T3
+Display T4

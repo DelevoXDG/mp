@@ -1,0 +1,9 @@
+1 8
+InsertFirst a b
+InsertLast a b
+Display a
+Trains
+Reverse a
+Union a b
+DelFirst a b
+DelLast a b

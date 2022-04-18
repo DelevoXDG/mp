@@ -1,0 +1,31 @@
+Trains: B A
+A: W0 W1 W2 W3
+B: W4 W5 W6 W7
+Trains: A
+A: W0 W1 W2 W3 W4 W5 W6 W7
+Trains: I H G F E D C B
+Train A does not exist
+B: W7
+C: W0
+D: W6
+E: W1
+F: W5
+G: W2
+H: W4
+I: W3
+Trains: B A
+A: W0 W1 W2 W3
+B: W4 W5 W6 W7
+Trains: A
+A: W0 W1 W2 W3 W4 W5 W6 W7
+A: W7 W6 W5 W4 W3 W2 W1 W0
+Trains: I H G F E D C B
+Train A does not exist
+B: W0
+C: W7
+D: W1
+E: W6
+F: W2
+G: W5
+H: W3
+I: W4

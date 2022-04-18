@@ -1,0 +1,15 @@
+T1: 1q
+Train T2 does not exist
+Train T3 does not exist
+Train T4 does not exist
+T1: w2 1q
+Train T2 does not exist
+Train T3 does not exist
+Train T4 does not exist
+Trains: T1
+Trains: T3 T1
+Trains: T4 T3
+Train T1 does not exist
+Train T2 does not exist
+T3: 1q
+T4: w2

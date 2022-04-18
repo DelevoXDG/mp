@@ -1,0 +1,69 @@
+2
+32
+New A W1
+InsertFirst A W0
+InsertLast A W2
+InsertLast A W3
+New B W7
+InsertFirst B W6
+InsertFirst B W5
+InsertFirst B W4
+Trains
+Display A
+Display B
+Union A B
+Trains
+Display A
+DelLast A B
+DelFirst A C
+DelLast A D
+DelFirst A E
+DelLast A F
+DelFirst A G
+DelLast A H
+DelFirst A I
+Trains
+Display A
+Display B
+Display C
+Display D
+Display E
+Display F
+Display G
+Display H
+Display I
+34
+New A W1
+InsertFirst A W0
+InsertLast A W2
+InsertLast A W3
+New B W7
+InsertFirst B W6
+InsertFirst B W5
+InsertFirst B W4
+Trains
+Display A
+Display B
+Union A B
+Trains
+Display A
+Reverse A
+Display A
+DelLast A B
+DelFirst A C
+DelLast A D
+DelFirst A E
+DelLast A F
+DelFirst A G
+DelLast A H
+DelFirst A I
+Trains
+Display A
+Display B
+Display C
+Display D
+Display E
+Display F
+Display G
+Display H
+Display I

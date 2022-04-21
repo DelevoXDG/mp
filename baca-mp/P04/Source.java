@@ -11,8 +11,6 @@ import java.util.Scanner;
 // O(1) dla wszystkich operacji poza Display oraz Trains, nie liczac pomocniczych operacji, wyszykiwajacych pociag
 // O(n) dla operacji Trains, Display
 // Zlozonosc niektorych funkcji jest dodatkowo wyjasniona w komentarzach do tej funckji
-// Section Todo
-// [ ] add checks when inserting
 
 // Section Struktury
 class Car {					// tak zwany "Node" jednostronnej dwukierunkowej listy wagonow
@@ -20,33 +18,39 @@ class Car {					// tak zwany "Node" jednostronnej dwukierunkowej listy wagonow
 	private Car _next;		// referencja do nastepnego wagonu
 	private Car _prev;		// referencja do poprzedniego wagonu
 
-	public Car(String name, Car prev, Car next) { 	// Konstruktor standardowy wagonu	
+	public Car(final String name, final Car prev, final Car next) { 	// Konstruktor standardowy wagonu	
 		// Ustawia nazwe, nastepny wagon, poprzedni wagon
 		this._name = name;
 		this._next = next;
 		this._prev = prev;
 	}
-	public Car(String name) {		// Konstruktor standardowy pierwszego wagonu dla danego pociagu
+
+	public Car(final String name) {		// Konstruktor standardowy pierwszego wagonu dla danego pociagu
 		// Poniewaz jest to jedyny element listy dwukierunkowej, next i prev wskazuju na ten sam wagon 
 		this._name = name;
 		this._next = this;
 		this._prev = this;
 	}
+
 	// Gettery
 	public String getName() {
 		return _name;
 	}
+
 	public Car getPrev() {
 		return _prev;
 	}
+
 	public Car getNext() {
 		return _next;
 	}
+
 	// Settery
-	public void hookNext(Car next) {
+	public void hookNext(final Car next) {
 		_next = next;
 	}
-	public void hookPrev(Car prev) {
+
+	public void hookPrev(final Car prev) {
 		_prev = prev;
 	}
 
@@ -66,32 +70,39 @@ class Train {
 	private Train _next;	// 	referencja do nastepnego pociagu
 	private Car _first;		//	referencja do pierwszego elementu listy wagonow		
 
-	public Train(String trainName, String carName, Train next) {	// Konstruktor pociagu
+	public Train(final String trainName, final String carName, final Train next) {	// Konstruktor pociagu
 		// Ustawia nowy pociag jako pierwszy w liscie reprezentujacej pociagi
 		this._name = trainName;			// Ustawia nazwe tego pociagu
 		this._first = new Car(carName);	// Ustawia pierwszy element listy wagonow, tworzac nowy wagon o nazwie carName
 		this._next = next;
 	}
-	public boolean isEqual(String trainName) {	//Sprawdza, czy podana nazwa jest rowna nazwie danego wagonu
+
+	public boolean isEqual(final String trainName) {	// Sprawdza, czy podana nazwa jest rowna nazwie danego wagonu
 		return this._name.equals(trainName);
 	}
-	public boolean isSingleCar() {
+
+	public boolean isSingleCar() {						// Sprawdza, czy pociag ma tylko jeden wagon
 		return this._first.getNext() == this._first && this.getLast().getPrev() == this._first;
 	}
+
 	// Gettery
 	public String getName() {
 		return _name;
 	}
+
 	public Train getNext() {
 		return _next;
 	}
+
 	public Car getFirst() {
 		return this._first;
 	}
+
 	public Car getLast() {
 		// Note: zalezy od pierwszego!!!
 		return this._first.getPrev();
 	}
+
 	public String getCarListStr() {
 		// Metoda, zwracajaca string z elementow listy wagonow
 		StringBuilder	carListString	= new StringBuilder(""); 	// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania nowych wagonow
@@ -117,17 +128,20 @@ class Train {
 
 		return carListString.toString();	// Zwrazamy wynik
 	}
+
 	// Settery
-	public void hookNext(Train next) {
+	public void hookNext(final Train next) {
 		_next = next;
 	}
+
 	// Metody
-	public void insertLastCar(String carName) {		// Wstawia nowy wagon na koniec listy cyklicznej 
+	public void insertLastCar(final String carName) {		// Wstawia nowy wagon na koniec listy cyklicznej 
 		Car insertedCar = new Car(carName, this.getLast(), this._first);
 		this.getLast().hookNext(insertedCar);
 		this._first.hookPrev(insertedCar);
 	}
-	public void insertFirstCar(String carName) {  // Wstawia nowy wagon na poczatek listy cyklicznej 
+
+	public void insertFirstCar(final String carName) {  // Wstawia nowy wagon na poczatek listy cyklicznej 
 		Car insertedCar = new Car(carName, this.getLast(), this._first);
 		this.getLast().hookNext(insertedCar);
 		this._first.hookPrev(insertedCar);
@@ -143,6 +157,7 @@ class Train {
 
 		this._first = last;			// Ustawenie ostatniego elementu listy jako pierwszego, bo pociag teraz zaczyna sie od ostatniego elementu
 	}
+
 	public String deleteLastCar() {	// Usuwamy ostatni wagon
 		Car	oldLast	= this.getLast();	// Ostatni wagon
 		Car	newLast	= oldLast.getPrev();// Przedostatni wagon, ktory po usunieciu zostanie ostatnim
@@ -156,6 +171,7 @@ class Train {
 
 		return oldLast.getName();	// Zwraca nazwe usunietego wagonu
 	}
+
 	public String deleteFirstCar() {
 		Car	oldFirst	= this.getFirst();	// Pierwszy wagon
 		Car	last		= this.getLast();	// Ostatni wagon
@@ -170,7 +186,6 @@ class Train {
 		_first = newFirst;			// Ustawiamy referencje pierwszego elementu na nowy pierwszy element 
 		return oldFirst.getName();// Zwraca nazwe usunietego wagonu
 	}
-
 }
 
 // Section List
@@ -180,9 +195,11 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 	public TrainList() {	// Konstruktor dla pustej stancji
 		this._trains = null;
 	}
-	public TrainList(Train train) {	// Konstrukor, dodajacy pierwszy pociag
+
+	public TrainList(final Train train) {	// Konstrukor, dodajacy pierwszy pociag
 		this._trains = train;
 	}
+
 	public Train findTrain(String trainName) {
 		// Funkcja, wyszukiwajaca pociag o podanej nazwie w jednym przejsciu po liscie
 		for (Train curTrain = this._trains; curTrain != null; curTrain = curTrain.getNext()) { // Przechodzi przez wszystkie elementy listy pociagow
@@ -192,7 +209,8 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 		}
 		return null; // Jezeli nie udalo znalezc pociag o danej nazwie, zwracamy null
 	}
-	public Train[] findTwoTrainsAndTrainBefore(String tNameA, String tNameB) {
+
+	public Train[] findTwoTrainsAndTrainBefore(final String tNameA, final String tNameB) {
 		// Funkcja, znajdujaca 
 		// - pociag o nazwie tNameA
 		// - pociag o nazwie tNameB
@@ -202,30 +220,34 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 		Train	trainA			= null;
 		Train	trainBeforeB	= null;
 		Train	trainB			= null;
-		boolean	found			= false;
+		// boolean	found			= false;
 
 		if (this._trains != null && this._trains.isEqual(tNameB)) {	// trainB jest pierwszy
 			trainBeforeB = null;			// Nie ma poprzedniego elementu listy, zaznaczamy to zwracajac null
 			trainB = this._trains;			// trainB - referencja do pierwszego pociagu
 		}
 		for (Train curTrain = this._trains; // przechodzimy po wszystkich elementach listy pociagow
-				curTrain != null && found == false; // Wyszykiwanie, poki nie znajdzimy pociag A oraz B lub skonczy sie lista
+				curTrain != null; // Wyszykiwanie, poki nie znajdzimy pociag A oraz B lub skonczy sie lista
 				curTrain = curTrain.getNext()) {
 			if (curTrain.isEqual(tNameA)) {	// Sprawdzamy, czy aktualny pociag ma nazwe tNameA
 				trainA = curTrain;
-				if (trainB != null) { found = true; }	// Jezeli znalezlismy pociagi o obu nazwach, mozemy skonczyc wyskukiwanie
+				if (trainB != null) {
+					break;
+				}	// Jezeli znalezlismy pociagi o obu nazwach, mozemy skonczyc wyskukiwanie
 			}
 			if (curTrain.getNext() != null && curTrain.getNext().isEqual(tNameB)) {	// Sprawdzamy, czy nastepujacy po aktualnym pociagu ma nazwe tNameB
 				trainBeforeB = curTrain;
 				trainB = curTrain.getNext();
-				if (trainA != null) { found = true; }	// Jezeli znalezlismy pociagi o obu nazwach, mozemy skonczyc wyskukiwanie
+				if (trainA != null) {
+					break;
+				}	// Jezeli znalezlismy pociagi o obu nazwach, mozemy skonczyc wyskukiwanie
 			}
 		}
 
 		return new Train[] { trainA, trainBeforeB, trainB };	// Zwracamy tablice, zawierajaca opisane pociagi
 	}
 
-	public String New(String trainName, String carName) {	//O(1), nie liczac wyszukiwania pociagu
+	public String New(final String trainName, final String carName) {	//O(1), nie liczac wyszukiwania pociagu
 		// Wstawenie pociagu na poczatek listy, zeby spelnic zlozonosc O(1)
 
 		if (this.findTrain(trainName) != null) {	// Jezeli juz istnieje pociag o podanej nazwie, zwracamy tekst odpowiedniego bledu
@@ -235,7 +257,8 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 
 		return "";	// Nie ma bledow
 	}
-	public String InsertLast(String trainName, String carName) {	//O(1), nie liczac wyszukiwania pociagu
+
+	public String InsertLast(final String trainName, final String carName) {	//O(1), nie liczac wyszukiwania pociagu
 		Train curTrain = findTrain(trainName);
 
 		if (curTrain == null) {		// Jezeli nie istnieje pociag o podanej nazwie, zwracamy tekst odpowiedniego bledu
@@ -245,7 +268,8 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 		curTrain.insertLastCar(carName);	// Wowolujemy odpowiednia metode dla danego pociaga(listy wagonow)
 		return "";		// Nie ma bledow
 	}
-	public String InsertFirst(String trainName, String carName) {	//O(1), nie liczac wyszukiwania pociagu
+
+	public String InsertFirst(final String trainName, final String carName) {	//O(1), nie liczac wyszukiwania pociagu
 		Train curTrain = findTrain(trainName);
 
 		if (curTrain == null) {		// Jezeli nie istnieje pociag o podanej nazwie, zwracamy tekst odpowiedniego bledu
@@ -256,7 +280,7 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 		return "";		// Nie ma bledow
 	}
 
-	public String GetTrainStr(String trainName) {		// O(n), musimy przejsc przez wszystkie pociagi
+	public String GetTrainStr(final String trainName) {		// O(n), musimy przejsc przez wszystkie pociagi
 		Train curTrain = findTrain(trainName);
 		if (curTrain == null) {		// Jezeli nie istnieje pociag o podanej nazwie, zwracamy tekst odpowiedniego bledu
 			return Error.getErrorStr(Error.trainNotExists, trainName);
@@ -267,7 +291,8 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 		return carList.toString();											// Zwracaa wynikowy napis
 
 	}
-	public String Reverse(String trainName) {		//O(1), nie liczac wyszukiwania pociagu
+
+	public String Reverse(final String trainName) {		//O(1), nie liczac wyszukiwania pociagu
 		Train curTrain = findTrain(trainName);
 
 		if (curTrain == null) {		// Jezeli nie istnieje pociag o podanej nazwie, zwracamy tekst odpowiedniego bledu
@@ -277,11 +302,13 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 
 		return "";	// Nie ma bledow
 	}
-	public String Union(String tNameA, String tNameB) {	// Dodawanie wagonow pociagu o nazwie tNameB na koniec pociagu o nazwie tNameA
+
+	public String Union(final String tNameA, final String tNameB) {	// Dodawanie wagonow pociagu o nazwie tNameB na koniec pociagu o nazwie tNameA
 		Train[]	TrainArr		= findTwoTrainsAndTrainBefore(tNameA, tNameB);
 		Train	trainA			= TrainArr[0];
 		Train	trainBeforeB	= TrainArr[1];	// Bo biedziemy musieli usunac trainB
 		Train	trainB			= TrainArr[2];
+
 		if (trainA == null) {	// Jezeli nie istnieje pociag o podanej nazwie, zwracamy tekst odpowiedniego bledu
 			return Error.getErrorStr(Error.trainNotExists, tNameA);
 		}
@@ -300,23 +327,28 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 		return "";
 	}
 
-	public void DeleteNext(Train trainBefore) {			// Usuwa pociag, na ktory wskazuje referencja next podanego pociagu
+	public void DeleteNext(final Train trainBefore) {			// Usuwa pociag, na ktory wskazuje referencja next podanego pociagu
 		//O(1)
 		if (trainBefore == null) {			// Przypadek, gdy usuwany element jest pierwszy ( nie ma "preva") 
 			_trains = _trains.getNext();
 			return;
 		}
+
 		trainBefore.hookNext(trainBefore.getNext().getNext());	// Ustawiamy next danego elementu, pomijajac usuwany elemnt
 	}
+
 	public String Trains() {					// Zwraca napis zawierajacy wypisane po koleji pociagi
 		//O(n), musimy przezsc przez wszystki pociagi
 		StringBuilder trainsSB = new StringBuilder("Trains:");		// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania nowych pociagow
+
 		for (Train curTrain = _trains; curTrain != null; curTrain = curTrain.getNext()) { // Przedzimy przez wszystkie pociagi
 			trainsSB.append(" ").append(curTrain.getName());
 		}
+
 		return trainsSB.append("\n").toString();	// Zwracamy wynik
 	}
-	public String delLast(String tNameA, String tNameB) {	// Usuwanie ostatniego wagonu z pociagu o nazwie tNameA, tworzenie nowego pociagu o nazwie tNameB
+
+	public String delLast(final String tNameA, final String tNameB) {	// Usuwanie ostatniego wagonu z pociagu o nazwie tNameA, tworzenie nowego pociagu o nazwie tNameB
 		Train[]	TrainArr		= findTwoTrainsAndTrainBefore(tNameB, tNameA);
 
 		Train	trainBeforeA	= TrainArr[1];  // Bo biedziemy musieli usunac trainA
@@ -337,11 +369,13 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 			// Usuwamy pociag trainA
 			return "";	// Nie ma bledow
 		}
+
 		String deletedName = trainA.deleteLastCar();	// Zapisujemy nazwe usuwanego wagonu z pociagu o trainA
 		this._trains = new Train(tNameB, deletedName, this._trains);				// Tworzymy nowy pociag z wagonem o nazwie usuwanego 
 		return "";  // Nie ma bledow
 	}
-	public String delFirst(String tNameA, String tNameB) {
+
+	public String delFirst(final String tNameA, final String tNameB) {
 		Train[]	TrainArr		= findTwoTrainsAndTrainBefore(tNameB, tNameA);
 
 		Train	trainBeforeA	= TrainArr[1];		// Bo biedziemy musieli usunac trainA
@@ -361,6 +395,7 @@ class TrainList {			// Lista pojedyncza, reprezentujaca pociagi, "Stancja"
 			this._trains = new Train(tNameB, deletedName, this._trains);  // Tworzymy nowy pociag z wagonem o nazwie usuwanego
 			return "";	// Nie ma bledow
 		}
+
 		String deletedName = trainA.deleteFirstCar();  // Zapisujemy nazwe usuwanego wagonu z pociagu o trainA
 		this._trains = new Train(tNameB, deletedName, this._trains); 		// Tworzymy nowy pociag z wagonem o nazwie usuwanego 
 
@@ -372,14 +407,13 @@ enum Error { // Klasa bledu
 	trainExists,	// Blad istenia pociagu o podanej nazwie
 	trainNotExists;	// Blad nieistnienia pociagu o podanej nazwie
 
-	public static String getErrorStr(Error errName, String trainName) { // Funkcja zwraca tekst odpowiedniego bledu dla pocigu o podanej nazwie
+	public static String getErrorStr(final Error errName, final String trainName) { // Funkcja zwraca tekst odpowiedniego bledu dla pocigu o podanej nazwie
 		switch (errName) {
 			case trainExists:
 				return "Train ".concat(trainName).concat(" already exists\n");
 			case trainNotExists:
 				return "Train ".concat(trainName).concat(" does not exist\n");
 			default:
-
 		}
 		return "";
 	}
@@ -389,16 +423,18 @@ public class Source {
 	public static Scanner sc = new Scanner(System.in);	// Scanner do wczytywania danych wejsciowych
 
 	public static void main(String[] args) {
-		long test_count = 0;		// Liczba zestawow
-		test_count = sc.nextLong();	// Wowolujemy liczbe zestawow
-		StringBuilder output = new StringBuilder();	// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow funkcji
+		long			test_count	= sc.nextLong();	// Wczytujemy liczbe zestawow
+
+		StringBuilder	output		= new StringBuilder();	// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow funkcji
+
 		while (test_count-- > 0) {	// Przechodzimy przez kazdy zestaw
 			long		OP_count	= sc.nextLong();		// Liczba operacji
-
 			TrainList	trainList	= new TrainList();		// Tworzenie obiektu klasy trainList, "stancji", "listy wszystkich pociagow"
+
 			while (OP_count-- > 0) {
 				String	OP_resultStr	= "";			// Wynik aktualnego polecenia
 				String	OP				= sc.next(); // Wczytujemy kolejne polecenia i wykonujemy odpowiednie funkcje
+
 				switch (OP) {
 					case "New": {
 						String	trainName	= sc.next();
@@ -428,7 +464,6 @@ public class Source {
 						break;
 					}
 					case "Trains": {
-
 						OP_resultStr = trainList.Trains();
 						break;
 					}

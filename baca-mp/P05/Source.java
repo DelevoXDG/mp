@@ -181,7 +181,7 @@ class Backpack {
 		boolean			result		= false;
 		result = rec_pakuj(this._capacity, 0, tempSB1);
 		if (result == false) {
-			return "BRAK";
+			return "BRAK\n";
 		}
 		resultStr.append("REC:  ").append(this._capacity).append(" =").append(tempSB1.toString()).append("\n");
 		result = iter_pakuj(this._capacity, tempSB2);

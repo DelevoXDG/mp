@@ -59,7 +59,7 @@ class musicCollection {
 		this.order = findOrder(orderNo);
 		this.quickSort();
 	}
-	public static boolean isNaturalNum(String str) {
+	private static boolean isNaturalNum(String str) {
 		for (char c : str.toCharArray()) {
 			if (Character.isDigit(c) == false) {
 				return false;
@@ -96,40 +96,47 @@ class musicCollection {
 	}
 
 	public static interface Order {
-
 		public boolean isBigger(String a, String b);
+
+		public boolean isBigger(Song A, Song B, int sortBy);
 	}
 
 	public static class NormalStr implements Order {
-		public boolean isBigger(String a, String b) {
-			int comp = a.compareTo(b);
-			if (comp <= 0)
-				return false;
-			return true;
+		public boolean isBigger(String A, String B) {
+			return A.compareTo(B) > 0;
+		}
+		public boolean isBigger(Song A, Song B, int sortBy) {
+			return A.getData(sortBy).compareTo(B.getData(sortBy)) > 0;
 		}
 	}
 	public static class NormalNum implements Order {
-		public boolean isBigger(String a, String b) {
-			return Integer.parseInt(a) > Integer.parseInt(b);
+		public boolean isBigger(String A, String B) {
+			return Integer.parseInt(A) > Integer.parseInt(B);
+		}
+		public boolean isBigger(Song A, Song B, int sortBy) {
+			return Integer.parseInt(A.getData(sortBy)) > Integer.parseInt(B.getData(sortBy));
 		}
 	}
 
 	public static class ReverseStr implements Order {
-		public boolean isBigger(String a, String b) {
-			int comp = a.compareTo(b);
-			if (comp >= 0)
-				return false;
-			return true;
+		public boolean isBigger(String A, String B) {
+			return A.compareTo(B) < 0;
+		}
+		public boolean isBigger(Song A, Song B, int sortBy) {
+			return A.getData(sortBy).compareTo(B.getData(sortBy)) < 0;
 		}
 	}
 	public static class ReverseNum implements Order {
-		public boolean isBigger(String a, String b) {
-			return Integer.parseInt(a) < Integer.parseInt(b);
+		public boolean isBigger(String A, String B) {
+			return Integer.parseInt(A) < Integer.parseInt(B);
+		}
+		public boolean isBigger(Song A, Song B, int sortBy) {
+			return Integer.parseInt(A.getData(sortBy)) < Integer.parseInt(B.getData(sortBy));
 		}
 	}
-	private int findNextR(int L) {
-		int i = L;
-		while (i < songs.length) {
+	private int findR(int L) {
+		int i = L - 1;
+		while (++i < songs.length) {
 			if (songs[i].isSorted() == true) {
 				break;
 			}
@@ -161,11 +168,9 @@ class musicCollection {
 		return L;
 	}
 	void selectionSort(int L, int R) {
-		int size = R - L + 1;
-		for (int i = L; i < size - 1; i++) {
+		for (int i = L; i < R; i++) {
 			int min_idx = i;
-			for (int j = i + 1; j < size; j++) {
-				// if (songs[j] < songs[min_idx])
+			for (int j = i + 1; j < R + 1; j++) {
 				if (order.isBigger(songs[min_idx].getData(sortBy), songs[j].getData(sortBy))) {
 					min_idx = j;
 				}
@@ -187,7 +192,7 @@ class musicCollection {
 				if (size <= 5) {
 					selectionSort(L, curR);
 					L = curR;
-					break;
+					continue;
 				}
 				int q = partition(L, curR);
 				songs[curR].toggleSorted();
@@ -199,7 +204,7 @@ class musicCollection {
 				break;
 			}
 			L++;
-			curR = findNextR(L);
+			curR = findR(L);
 			songs[curR].toggleSorted();
 		}
 	}
@@ -268,6 +273,7 @@ public class Source {
 				bringForward(meta, sortByCol);
 				songs[i] = new Song(meta);
 			}
+			sortByCol = 0;
 
 			musicCollection music = new musicCollection(labels, songs, sortByCol, orderNo);	// Inicjalizacja kolekcji piosenek, ktora tez tasuje piosenki i wyznacza najdluzszy wspolny prefiks
 			// output.(music);

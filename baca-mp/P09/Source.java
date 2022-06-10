@@ -547,23 +547,23 @@ class BST {
 		}
 		return new Node[] { prev, prevprev };
 	}
-	public Node enque(Person toAdd, Node start) {
+	public Node enque(Person x, Node start) {
 		if (start == null) {
-			start = new Node(toAdd);
+			start = new Node(x);
 		} else {
 			Node prev = null;
-			for (Node cur = start; cur != null;) {
-				prev = cur;
-				if (toAdd.priority < cur.L.info.priority) {
-					cur = cur.L;
+			for (Node p = start; p != null;) {
+				prev = p;
+				if (x.priority < p.info.priority) {
+					p = p.L;
 				} else {
-					cur = cur.R;
+					p = p.R;
 				}
 			}
-			if (toAdd.priority < prev.info.priority) {
-				prev.L = new Node(toAdd);
+			if (x.priority < prev.info.priority) {
+				prev.L = new Node(x);
 			} else {
-				prev.R = new Node(toAdd);
+				prev.R = new Node(x);
 			}
 		}
 		return start;
@@ -635,73 +635,88 @@ class BST {
 	public Node[] findNodeAndParent(final int priority) {
 		Node	parent	= null;
 		Node	cur		= null;
-		for (cur = this.root; cur != null && cur.info.priority != priority;) {
-			parent = cur;
+		boolean	found	= false;
+		for (cur = this.root; cur != null && found == false;) {
 			if (priority < cur.info.priority) {
+				parent = cur;
 				cur = cur.L;
-			} else {
+			} else if (priority > cur.info.priority) {
+				parent = cur;
 				cur = cur.R;
+			} else {
+				found = true;
 			}
+		}
+		if (found == false) {
+			return new Node[] { null, null };
 		}
 		return new Node[] { cur, parent };
 	}
-
-	public Node delete(final int priority) {
-		Node[]	nodeInfo	= findNodeAndParent(priority);
-		Node	toDel		= nodeInfo[0];
-		Node	parent		= nodeInfo[1];
+	public Node deleteNode(Node toDel, Node parent) {
 		if (toDel == null) {
 			return toDel;
 		}
-		Node replacement = null;
 		if (toDel.L == null || toDel.R == null) {
+			Node repl = null;
 			if (toDel.L == null && toDel.R == null) {
-				replacement = null;
+				repl = null;
 			} else if (toDel.L != null) {
-				replacement = toDel.L;
+				repl = toDel.L;
 			} else {
-				replacement = toDel.R;
+				repl = toDel.R;
 			}
 			if (parent == null) {
-				this.root = replacement;
-			} else if (parent.L != null) {
-				parent.L = replacement;
+				this.root = repl;
+			} else if (parent.L == toDel) {
+				parent.L = repl;
 			} else {
-				parent.R = replacement;
+				parent.R = repl;
 			}
 			return toDel;
 		}
-		Node finder = toDel.R;
-		parent = finder;
-		for (finder = toDel.R; finder != null && finder.L != null;) {
-			parent = finder;
-			finder = finder.L;
-		}
-		if (parent == finder) {
-			toDel.R = finder.R;
+		Node	next		= null;
+		Node	nextParent	= null;
+		if (toDel.R.L == null) {
+			// Jezeli prawe dziecko usuwanego elementa jest jego nastepnikiem (nie ma lewego poddrzewa), 
+			// mozemy zastosowac prostszy podstawowy przypadek usuwania wezla z jednym dzieckiem / brakiem dzieci
+			// Zatem poprostu ustawiamy prawe dziecko (tez moze byc rowne null) nastepnika jako prawo poddrzewo usuwanego elementa
+			// Tym samym usuwajac nastepnik z calego drzewa
+			next = toDel.R;
+			toDel.R = next.R;
 		} else {
-			parent.L = finder.R;
+			Node[] nodeInfo = findMin(toDel.R);
+			next = nodeInfo[0];
+			nextParent = nodeInfo[1];
+			// Usuwanie najmniejszego elementu, ten element moze miec jedynie prawo dziecko lub nie miec dzieci w ogole
+			// Zatem zamiast wszazywac na usuniety nastepnik, lewe poddrzewo rodzica nastepnika teraz wskazuje na jedno dziecko nastepnika/null  
+			//Tym samym usuwajac nastepnik z calego drzewa
+			nextParent.L = next.R;
 		}
-		toDel.info = finder.R.info;
+		// Naprawilismy referencje, a poniewaz znalezlismy i usunelismy nastepnik danego elementa z drzewa
+		// Nadpisujemy wartosc usuwanego drzewa wartoscia nastepnika 
+		toDel.info = next.info;
 
 		return toDel;
 	}
+	public Node deleteValue(final int priority) {
+		Node[]	nodeInfo	= findNodeAndParent(priority);
+		Node	toDel		= nodeInfo[0];
+		Node	parent		= nodeInfo[1];
+		return deleteNode(toDel, parent);
+	}
 	public Node dequeMin() {
-		if (this.root == null) {
-			return null;
-		}
-		Node minPriority, prev;
-		for (prev = null, minPriority = this.root; minPriority != null && minPriority.L != null;) {
-			prev = minPriority;
-			minPriority = minPriority.L;
-		}
-		if (prev == null) {
-			this.root = this.root.R;
-		} else {
-			prev.L = minPriority.R;
-		}
+		Node[]	nodeInfo	= findMin(this.root);
+		Node	minNode		= nodeInfo[0];
+		Node	parent		= nodeInfo[1];
 
-		return minPriority;
+		return deleteNode(minNode, parent);
+	}
+	public Node dequeMax() {
+		Node[]	nodeInfo	= findMax(this.root);
+		Node	maxNode		= nodeInfo[0];
+		Node	parent		= nodeInfo[1];
+
+		return deleteNode(maxNode, parent);
 	}
 	public Node findMin() {
 		return findMin(this.root)[0];
@@ -753,6 +768,47 @@ class BST {
 	public String toString(Order order) {
 		return order.getString(root);
 	}
+
+	public static void traverseNodes(StringBuilder sb, String padding, String pointer, Node node, boolean hasRightSib) {
+		if (node != null) {
+			sb.append("\n");
+			sb.append(padding);
+			sb.append(pointer);
+			sb.append(node.getValue().priority);
+
+			StringBuilder paddingBuilder = new StringBuilder(padding);
+			if (hasRightSib) {
+				paddingBuilder.append("│  ");
+			} else {
+				paddingBuilder.append("   ");
+			}
+
+			String	paddingForBoth	= paddingBuilder.toString();
+			String	pointerRight	= "└──";
+			String	pointerLeft		= (node.getRight() != null) ? "├──" : "└──";
+
+			traverseNodes(sb, paddingForBoth, pointerLeft, node.getLeft(), node.getRight() != null);
+			traverseNodes(sb, paddingForBoth, pointerRight, node.getRight(), false);
+		}
+	}
+
+	public static String traversePreOrder(Node root) {
+		// Formats BST and creates tree graph
+		if (root == null) {
+			return "";
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(root.getValue().priority);
+
+		String	pointerRight	= "└──";
+		String	pointerLeft		= (root.getRight() != null) ? "├──" : "└──";
+
+		traverseNodes(sb, "", pointerLeft, root.getLeft(), root.getRight() != null);
+		traverseNodes(sb, "", pointerRight, root.getRight(), false);
+
+		return sb.toString();
+	}
 }
 
 public class Source {
@@ -765,6 +821,7 @@ public class Source {
 			StringBuilder	curOut	= new StringBuilder("");
 			while (opCount-- > 0) {
 				StringBuilder	result	= new StringBuilder("");
+				// result.append(BST.traversePreOrder(tree.getRoot())).append("\n");
 				String			request	= sc.next();
 				switch (request) {
 					case "CREATE": {
@@ -782,20 +839,39 @@ public class Source {
 					}
 					case "DELETE": {
 						int priority = sc.nextInt();
-						if (tree.getNode(priority) == null) {
+						// if (tree.getNode(priority) == null) {
+						if (tree.deleteValue(priority) == null) {
 							result.append(request).append(" ").append(priority).append(": BRAK");
 						}
-						tree.setRoot(tree.deleteOld(priority, tree.getRoot()));
+						// result.append(BST.traversePreOrder(tree.getRoot())).append("\n");
+						// tree.setRoot(tree.deleteOld(priority, tree.getRoot()));
 						break;
 					}
 					case "ENQUE": {
-						int personToAdd = sc.nextInt();
+						int		priority	= sc.nextInt();
+						String	name		= sc.next();
+						String	surname		= sc.next();
+						tree.enque(new Person(name, surname, priority));
 						break;
 					}
 					case "DEQUEMAX": {
+						result.append(request).append(": ");
+						Node max = tree.dequeMax();
+						if (max == null) {
+							result.append("BRAK");
+							break;
+						}
+						result.append(BST.NodeToString(max.info));
 						break;
 					}
 					case "DEQUEMIN": {
+						result.append(request).append(": ");
+						Node min = tree.dequeMin();
+						if (min == null) {
+							result.append("BRAK");
+							break;
+						}
+						result.append(BST.NodeToString(min.info));
 						break;
 					}
 					case "NEXT": {
@@ -853,7 +929,7 @@ public class Source {
 					}
 					case "HEIGHT": {
 						result.append(request).append(": ");
-						result.append(Integer.toString(tree.getHeight(tree.getRoot())));
+						result.append(Integer.toString(Math.max(tree.getHeight(tree.getRoot()) - 1, 0)));
 						break;
 					}
 				}
@@ -861,8 +937,7 @@ public class Source {
 					curOut.append(result.toString()).append("\n");
 				}
 			}
-			System.out.print("ZESTAW " + testNo + "\n");
-			System.out.print(curOut);
+			System.out.print("ZESTAW " + testNo + "\n" + curOut);
 		}
 	}
 }

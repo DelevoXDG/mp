@@ -497,10 +497,9 @@ class BST {
 		}
 		return null;
 	}
-	public Node findPrev(int priority, Node start) {
-		Node	cur			= start;
-		Node	maxPriority	= null;
-		while (cur != null) {
+	public Node findPrev(final int priority, Node start) {
+		Node maxPriority = null;
+		for (Node cur = start; cur != null;) {
 			if (priority > cur.info.priority) {
 				maxPriority = cur;
 				cur = cur.R;
@@ -510,10 +509,9 @@ class BST {
 		}
 		return maxPriority;
 	}
-	public Node findNext(int priority, Node start) {
-		Node	cur			= start;
-		Node	minPriority	= null;
-		while (cur != null) {
+	public Node findNext(final int priority, Node start) {
+		Node minPriority = null;
+		for (Node cur = start; cur != null;) {
 			if (priority < cur.info.priority) {
 				minPriority = cur;
 				cur = cur.L;
@@ -523,23 +521,29 @@ class BST {
 		}
 		return minPriority;
 	}
-	public Node findMin(Node cur) {
+	public Node findPrev(final int priority) {
+		return findPrev(priority, this.root);
+	}
+	public Node findNext(final int priority) {
+		return this.findNext(priority, this.root);
+	}
+	public Node findMin(final Node start) {
 		Node prev = null;
-		while (cur != null) {
+		for (Node cur = start; cur != null;) {
 			prev = cur;
 			cur = cur.getLeft();
 		}
 		return prev;
 	}
-	public Node findMax(Node cur) {
+	public Node findMax(final Node start) {
 		Node prev = null;
-		while (cur != null) {
+		for (Node cur = start; cur != null;) {
 			prev = cur;
 			cur = cur.getRight();
 		}
 		return prev;
 	}
-	public Node insert(Person toAdd, Node start) {
+	public Node enque(Person toAdd, Node start) {
 		if (start == null) {
 			start = new Node(toAdd);
 		} else {
@@ -560,54 +564,10 @@ class BST {
 		}
 		return start;
 	}
-	public void insert(Person toAdd) {
-		root = insert(toAdd, this.root);
+	public void enque(Person toAdd) {
+		root = enque(toAdd, this.root);
 	}
-	public Node findMin() {
-		return findMin(this.root);
-	}
-	public Node findMax() {
-		return findMax(this.root);
-	}
-	// private Node delete(Node cur, int priority) {
-	// 	if (cur == null) {
-	// 		return null;
-	// 	}
-	// 	if (priority < cur.info.priority) {
-	// 		Node replacement = delete(cur.getLeft(), priority);
-	// 		cur.L = replacement;
-	// 		return cur;
-	// 	}
-	// 	if (priority > cur.info.priority) {
-	// 		Node replacement = delete(cur.getRight(), priority);
-	// 		cur.R = replacement;
-	// 		return cur;
-	// 	}
-	// 	if (cur.getLeft() == null) {
-	// 		return cur;
-	// 	}
-	// 	if (cur.getRight() == null) {
-	// 		return cur.getLeft();
-	// 	}
-	// 	Node replacement = findMin(cur.getRight());
-	// 	cur.info = replacement.info;
-	// 	Node newChild = delete(cur.R, cur.info.priority);
-	// 	cur.setRight(newChild);
-	// 	return cur;
-	// 	// return "";
-	// }
-	public Node getNode(int priority) {
-		Node cur = root;
-		while (cur != null && cur.info.priority != priority) {
-			if (priority < cur.info.priority) {
-				cur = cur.L;
-			} else {
-				cur = cur.R;
-			}
-		}
-		return cur;
-	}
-	public Node delete(int priority, Node start) {
+	public Node deque(int priority, Node start) {
 		paramsStack stack = new paramsStack(8);
 		stack.push(new Params(0, start));
 		Node result = null;
@@ -620,7 +580,6 @@ class BST {
 						result = null;
 						break;
 					}
-					// Person p = cur.info;
 					if (priority < cur.info.priority) {
 						stack.push(new Params(1, cur));
 						stack.push(new Params(0, cur.L));
@@ -639,7 +598,8 @@ class BST {
 						result = cur.L;
 						break;
 					}
-					Node replacement = findMin(cur.R);
+					// Node replacement = findMin(cur.R);
+					Node replacement = findSuccessor(cur, cur);
 					cur.info = replacement.info;
 					stack.push(new Params(3, cur));
 					priority = cur.info.priority;
@@ -665,39 +625,62 @@ class BST {
 		}
 		return result;
 	}
-	public void delete(int priority) {
-		this.root = delete(priority, this.root);
+	public void deque(int priority) {
+		this.root = deque(priority, this.root);
 	}
-	public static void traverseNodes(StringBuilder sb, String padding, String pointer, Node node, boolean hasRightSib) {
-		if (node != null) {
-			sb.append("\n");
-			sb.append(padding);
-			sb.append(pointer);
-			sb.append(node.getValue());
-			StringBuilder paddingBuilder = new StringBuilder(padding);
-			if (hasRightSib) {
-				paddingBuilder.append("│  ");
+	public Node dequeMin() {
+
+		if (this.root == null) {
+			return null;
+		}
+		Node minPriority, prev;
+		for (prev = null, minPriority = this.root; minPriority != null && minPriority.L != null;) {
+			prev = minPriority;
+			minPriority = minPriority.L;
+		}
+		if (prev == null) {
+			this.root = this.root.R;
+		} else {
+			prev.L = minPriority.R;
+		}
+
+		return minPriority;
+	}
+	public Node findMin() {
+		return findMin(this.root);
+	}
+	public Node findMax() {
+		return findMax(this.root);
+	}
+	public Node getNode(int priority) {
+		Node cur = root;
+		while (cur != null && cur.info.priority != priority) {
+			if (priority < cur.info.priority) {
+				cur = cur.L;
 			} else {
-				paddingBuilder.append("   ");
+				cur = cur.R;
 			}
-			String	paddingForBoth	= paddingBuilder.toString();
-			String	pointerRight	= "└──";
-			String	pointerLeft		= (node.getRight() != null) ? "├──" : "└──";
-			traverseNodes(sb, paddingForBoth, pointerLeft, node.getLeft(), node.getRight() != null);
-			traverseNodes(sb, paddingForBoth, pointerRight, node.getRight(), false);
 		}
+		return cur;
 	}
-	public static String traversePreOrder(Node root) {
-		if (root == null) {
-			return "";
+	private Node findSuccessor(Node n, Node start) {
+		// Rozni sie od findNext tym, ze szuka nie najblizszy wzgledem korzenia element, ale nastepnika dla danego Node'a
+		if (n.R != null) {
+			return findMin(n.R);
 		}
-		StringBuilder sb = new StringBuilder();
-		sb.append(root.getValue());
-		String	pointerRight	= "└──";
-		String	pointerLeft		= (root.getRight() != null) ? "├──" : "└──";
-		traverseNodes(sb, "", pointerLeft, root.getLeft(), root.getRight() != null);
-		traverseNodes(sb, "", pointerRight, root.getRight(), false);
-		return sb.toString();
+		if (start == null) {
+			return null;
+		}
+		Node result = null;
+		for (Node cur = start; cur != null && n.info.priority == cur.info.priority;) {
+			if (n.info.priority < cur.info.priority) {
+				result = cur;
+				cur = cur.L;
+			} else {
+				cur = cur.R;
+			}
+		}
+		return result;
 	}
 	public int getHeight(Node cur) {
 		if (cur == null) {
@@ -705,10 +688,7 @@ class BST {
 		}
 		int	L	= getHeight(cur.L);
 		int	R	= getHeight(cur.R);
-		if (L > R) {
-			return L + 1;
-		}
-		return R + 1;
+		return Math.max(L, R) + 1;
 	}
 	public String toString(Order order, Node start) {
 		return order.getString(start);
@@ -748,7 +728,7 @@ public class Source {
 						if (tree.getNode(priority) == null) {
 							result.append(request).append(" ").append(priority).append(": BRAK");
 						}
-						tree.setRoot(tree.delete(priority, tree.getRoot()));
+						tree.setRoot(tree.deque(priority, tree.getRoot()));
 						break;
 					}
 					case "ENQUE": {

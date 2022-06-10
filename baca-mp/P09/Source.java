@@ -1,12 +1,22 @@
+
+// Maksim Zdobnikau - 2
+
+// Ogolna idea rozwiazania
+// Rozwiazanie opiera sie na wlasnosciach bst
+// CREATE i HEIGHT zaimplementowane rekurencyjnie, reszta - iteracyjnie
+// Funckje wypisywania preorder, inorder, postorder uzywaja wlasna implementacje stosu stanow wywolanej funkcji, czyli parametry funkcji i miejsce, od ktorego
+// jest wykonywana
+
 import java.util.Scanner;
 
-class Params {
-	private int context;
-	public Node node;
-	public Params(int adrs, Node node) {
+class Params {				// Klasa parametrow aktualnego wywolania "rekurencyjnego" funkcji rekurencyjnej
+	private int context;	// Od ktorego miejsca kontynujemy wykonywanie funkcji 
+	public Node node;		// Argument funkcji rekurencyjnej
+	public Params(int adrs, Node node) {	// Konstruktor
 		this.context = adrs;
 		this.node = node;
 	}
+	// Gettery
 	public int getContext() {
 		return context;
 	}
@@ -15,191 +25,81 @@ class Params {
 	}
 }
 
-class paramsStack {
-	private Params[] arr;
-	private int top;
-	paramsStack(final int initSize) {
+class paramsStack {			// Stos przechowywujacy kolejne parametry dla funkcji symulacji funkcji rekurencyjnej
+	private Params[] arr;	// Tablica dynamiczna dla trzymania parametrow
+	private int top;		// Indeks ostatniego elementu na stosie
+	paramsStack(final int initSize) {		// Konstruktor
 		arr = new Params[initSize];
 		top = 0;
 	}
-	public void push(final Params p) {
-		if (this.isFull()) {
-			Params[] tmp = new Params[this.arr.length * 2];
+	public void push(final Params p) {		// Dodawanie
+		if (this.isFull()) {				// Ewentualne zwiekszenie rozmiaru tablicy, jezeli wypelnilismy stos
+			Params[] tmp = new Params[this.arr.length * 2];	// Tworzenie nowej podtablicy o dwa razy wiekszej pojemnosci i kopiowanie wartosci
 			for (int i = 0; i < this.arr.length; i++) {
 				tmp[i] = this.arr[i];
 			}
-			this.arr = tmp;
+			this.arr = tmp;		// Referencja wskazuje na nowa tablice
 		}
-		arr[top++] = p;
+		arr[top++] = p;		// Dodajemy na stos, zwiekszamy indeks ostatniego elementu 
 	}
 	public Params pop() {
 		if (top - 1 < 0) {
 			throw new ArrayIndexOutOfBoundsException("Stack underflow");
 		}
 		top--;
-		return arr[top];
+		return arr[top];	// Usuwamy i zwracamy ostatnio dodany element
 	}
-	public Params peek() {
+	public Params peek() {	// Przegladamy ostatnio dodany element stosu
 		if (top <= 0) {
 			throw new ArrayIndexOutOfBoundsException("Stack is empty");
 		}
 		return arr[top - 1];
 	}
 	public boolean isEmpty() {
+		// Funkcja sprawdza, czy stos jest pusty
 		return top == 0;
 	}
 	public boolean nonEmpty() {
+		// Funkcja sprawdza, czy stos jest nie pusty
 		return top != 0;
 	}
 	public boolean isFull() {
+		// Funkcja sprawdza, czy stos jest wypelniony
 		return top == arr.length;
 	}
 	public int size() {
-		return top;
-	}
-}
-
-class ParamsExt {
-	private int context;
-	public Node node;
-	private int value;
-	public ParamsExt(int adrs, Node node) {
-		this.context = adrs;
-		this.node = node;
-	}
-	public int getContext() {
-		return context;
-	}
-	public Node getNode() {
-		return node;
-	}
-}
-
-class paramsStackExt {
-	private Params[] arr;
-	private int top;
-	paramsStackExt(final int initSize) {
-		arr = new Params[initSize];
-		top = 0;
-	}
-	public void push(final Params p) {
-		if (this.isFull()) {
-			Params[] tmp = new Params[this.arr.length * 2];
-			for (int i = 0; i < this.arr.length; i++) {
-				tmp[i] = this.arr[i];
-			}
-			this.arr = tmp;
-		}
-		arr[top++] = p;
-	}
-	public Params pop() {
-		if (top - 1 < 0) {
-			throw new ArrayIndexOutOfBoundsException("Stack underflow");
-		}
-		top--;
-		return arr[top];
-	}
-	public Params peek() {
-		if (top <= 0) {
-			throw new ArrayIndexOutOfBoundsException("Stack is empty");
-		}
-		return arr[top - 1];
-	}
-	public boolean isEmpty() {
-		return top == 0;
-	}
-	public boolean nonEmpty() {
-		return top != 0;
-	}
-	public boolean isFull() {
-		return top == arr.length;
-	}
-	public int size() {
+		// Zwraca aktualny rozmiar stosu
 		return top;
 	}
 }
 
 class Person {
-	public int priority;
-	public String name;
-	public String surname;
+	public int priority;			// priorytet osoby
+	public String name;				// imie osoby
+	public String surname;			// Nazwisko osoby
 	Person(String name, String surname, int priority) {
 		this.name = name;
 		this.surname = surname;
 		this.priority = priority;
-	}
-}
+	}	// konstruktor
+}	// koniec klasy Person
 
 class Node {
-	public Person info;
-	public Node L;
-	public Node R;
-	public Node parent;
-	Node() {
-		this.info = null;
-		this.L = null;
-		this.R = null;
-		this.parent = null;
-	}
+	public Person info;		// element danych (klucz)
+	public Node L;			// lewy potomek węzła
+	public Node R;			// prawy lewy potomek węzła 
+
 	Node(Person value) {
 		this.info = value;
 		this.L = null;
 		this.R = null;
-		this.parent = null;
-	}
-	public Node(Person value, Node L, Node R, Node parent) {
-		this.info = value;
-		this.L = L;
-		this.R = R;
-		this.parent = parent;
-	}
-	public Person getValue() {
-		return this.info;
-	}
-	public void setValue(Person value) {
-		this.info = value;
-	}
-	public Node getLeft() {
-		return this.L;
-	}
-	public void setLeft(Node L) {
-		this.L = L;
-		if (L == null) {
-			return;
-		}
-		L.setParent(this);
-	}
-	public Node getRight() {
-		return this.R;
-	}
-	public void setRight(Node R) {
-		this.R = R;
-		if (R == null) {
-			return;
-		}
-		R.setParent(this);
-	}
-	public Node getParent() {
-		return this.parent;
-	}
-	public void setParent(Node parent) {
-		this.parent = parent;
-	}
-	@Override public String toString() {
-		return "{" +
-				"this='" + this.getValue() + "'" +
-				", L='" + (L != null ? this.L.getValue() : "null") + "'" +
-				", R='" + (R != null ? this.R.getValue() : "null") + "'" +
-				", parent='" + (parent != null ? this.parent.getValue() : "null") + "'" +
-				"}";
-	}
+	}	// konstruktor
 }
+// koniec klasy Person
 
 class BST {
-	private Node root;
-	private StringBuilder result;
-	private Person[] arr;
-	private Order order;
+	private Node root;		// Korzen drzewa
+
 	class Index {
 		private int index;
 		Index(int i) {
@@ -228,19 +128,18 @@ class BST {
 		this.root = null;
 	}
 	BST(Person[] arr, String orderName) {
-		this.arr = arr;
-		this.order = parseOrder(orderName);
-		Index idx = order.getIndex();
-		this.root = this.order.Create(idx, arr[idx.getIndex()], Integer.MIN_VALUE, Integer.MAX_VALUE);
+		Order	order	= parseOrder(orderName, arr);
+		Index	idx		= order.getIndex();
+		this.root = order.Create(idx, arr[idx.getIndex()], Integer.MIN_VALUE, Integer.MAX_VALUE);
 	}
-	public Order parseOrder(String orderName) {
+	public Order parseOrder(String orderName, Person[] arr) {
 		switch (orderName) {
 			case "PREORDER":
-				return new preOrder(this);
+				return new preOrder(arr);
 			case "INORDER":
-				return new inOrder(this);
+				return new inOrder(arr);
 			case "POSTORDER":
-				return new postOrder(this);
+				return new postOrder(arr);
 		}
 		throw new IllegalArgumentException("Undefined order.");
 	}
@@ -256,19 +155,12 @@ class BST {
 		public void action(Node node) {
 		}
 	}
-	private static class Print implements Action {
-		public void action(Node node) {
-			System.out.println(node.getValue());
-		}
-	}
-	private static class AddToList implements Action {
-		public void action(Node node) {
-		}
-	}
 	public interface Order {
 		void traverse(Node cur);
 
 		Index getIndex();
+
+		void setArray(Person[] arr);
 
 		Node Create(Index preIndex, Person data, int MIN, int MAX);
 
@@ -279,13 +171,20 @@ class BST {
 	public class preOrder implements Order {
 		Action act;
 		Person[] arr;
-		preOrder(BST tree) {
-			this.arr = tree.arr;
+		preOrder(Person[] arr) {
+			this.arr = arr;
 			this.act = new Blank();
+		}
+		preOrder() {
+
 		}
 		preOrder(Action action) {
 			this.act = action;
 		}
+		public void setArray(Person[] arr) {
+			this.arr = arr;
+		}
+
 		public Index getIndex() {
 			return new Index(0);
 		}
@@ -342,20 +241,25 @@ class BST {
 		public void traverse(Node cur) {
 			if (cur != null) {
 				act.action(cur);
-				traverse(cur.getLeft());
-				traverse(cur.getRight());
+				traverse(cur.L);
+				traverse(cur.R);
 			}
 		}
 	}
 	public class inOrder implements Order {
 		Action act;
 		Person[] arr;
-		inOrder(BST tree) {
-			this.arr = tree.arr;
+		inOrder() {
+		}
+		inOrder(Person[] arr) {
+			this.arr = arr;
 			this.act = new Blank();
 		}
 		inOrder(Action action) {
 			this.act = action;
+		}
+		public void setArray(Person[] arr) {
+			this.arr = arr;
 		}
 		public Index getIndex() {
 			return new Index(0);
@@ -395,21 +299,27 @@ class BST {
 		}
 		public void traverse(Node cur) {
 			if (cur != null) {
-				traverse(cur.getLeft());
+				traverse(cur.L);
 				act.action(cur);
-				traverse(cur.getRight());
+				traverse(cur.R);
 			}
 		}
 	}
 	public class postOrder implements Order {
 		Action act;
 		Person[] arr;
-		postOrder(BST tree) {
-			this.arr = tree.arr;
+		postOrder() {
+
+		}
+		postOrder(Person[] arr) {
+			this.arr = arr;
 			this.act = new Blank();
 		}
 		postOrder(Action action) {
 			this.act = action;
+		}
+		public void setArray(Person[] arr) {
+			this.arr = arr;
 		}
 		public Index getIndex() {
 			return new Index(arr.length - 1);
@@ -470,8 +380,8 @@ class BST {
 		}
 		public void traverse(Node cur) {
 			if (cur != null) {
-				traverse(cur.getLeft());
-				traverse(cur.getRight());
+				traverse(cur.L);
+				traverse(cur.R);
 				act.action(cur);
 			}
 		}
@@ -774,7 +684,7 @@ class BST {
 			sb.append("\n");
 			sb.append(padding);
 			sb.append(pointer);
-			sb.append(node.getValue().priority);
+			sb.append(node.info.priority);
 
 			StringBuilder paddingBuilder = new StringBuilder(padding);
 			if (hasRightSib) {
@@ -785,10 +695,10 @@ class BST {
 
 			String	paddingForBoth	= paddingBuilder.toString();
 			String	pointerRight	= "└──";
-			String	pointerLeft		= (node.getRight() != null) ? "├──" : "└──";
+			String	pointerLeft		= (node.R != null) ? "├──" : "└──";
 
-			traverseNodes(sb, paddingForBoth, pointerLeft, node.getLeft(), node.getRight() != null);
-			traverseNodes(sb, paddingForBoth, pointerRight, node.getRight(), false);
+			traverseNodes(sb, paddingForBoth, pointerLeft, node.L, node.R != null);
+			traverseNodes(sb, paddingForBoth, pointerRight, node.R, false);
 		}
 	}
 
@@ -799,13 +709,13 @@ class BST {
 		}
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(root.getValue().priority);
+		sb.append(root.info.priority);
 
 		String	pointerRight	= "└──";
-		String	pointerLeft		= (root.getRight() != null) ? "├──" : "└──";
+		String	pointerLeft		= (root.R != null) ? "├──" : "└──";
 
-		traverseNodes(sb, "", pointerLeft, root.getLeft(), root.getRight() != null);
-		traverseNodes(sb, "", pointerRight, root.getRight(), false);
+		traverseNodes(sb, "", pointerLeft, root.L, root.R != null);
+		traverseNodes(sb, "", pointerRight, root.R, false);
 
 		return sb.toString();
 	}
@@ -814,7 +724,8 @@ class BST {
 public class Source {
 	public static Scanner sc = new Scanner(System.in);
 	public static void main(String[] args) {
-		int test_count = sc.nextInt();
+		int				test_count	= sc.nextInt();
+		StringBuilder	output		= new StringBuilder("");
 		for (int testNo = 1; testNo < test_count + 1; testNo++) {
 			int				opCount	= sc.nextInt();
 			BST				tree	= new BST();
@@ -914,17 +825,17 @@ public class Source {
 					}
 					case "PREORDER": {
 						result.append(request).append(": ");
-						result.append(tree.toString(tree.new preOrder(tree)));
+						result.append(tree.toString(tree.new preOrder()));
 						break;
 					}
 					case "INORDER": {
 						result.append(request).append(": ");
-						result.append(tree.toString(tree.new inOrder(tree)));
+						result.append(tree.toString(tree.new inOrder()));
 						break;
 					}
 					case "POSTORDER": {
 						result.append(request).append(": ");
-						result.append(tree.toString(tree.new postOrder(tree)));
+						result.append(tree.toString(tree.new postOrder()));
 						break;
 					}
 					case "HEIGHT": {
@@ -937,7 +848,9 @@ public class Source {
 					curOut.append(result.toString()).append("\n");
 				}
 			}
-			System.out.print("ZESTAW " + testNo + "\n" + curOut);
+			output.append("ZESTAW ").append(testNo).append("\n").append(curOut);
 		}
+		// System.out.print("ZESTAW " + testNo + "\n" + curOut);
+		System.out.print(output);
 	}
 }

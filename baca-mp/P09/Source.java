@@ -527,21 +527,25 @@ class BST {
 	public Node findNext(final int priority) {
 		return this.findNext(priority, this.root);
 	}
-	public Node findMin(final Node start) {
-		Node prev = null;
+	public Node[] findMin(final Node start) {
+		Node	prev		= null;
+		Node	prevprev	= null;
 		for (Node cur = start; cur != null;) {
+			prevprev = prev;
 			prev = cur;
-			cur = cur.getLeft();
+			cur = cur.L;
 		}
-		return prev;
+		return new Node[] { prev, prevprev };
 	}
-	public Node findMax(final Node start) {
-		Node prev = null;
+	public Node[] findMax(final Node start) {
+		Node	prev		= null;
+		Node	prevprev	= null;
 		for (Node cur = start; cur != null;) {
+			prevprev = prev;
 			prev = cur;
-			cur = cur.getRight();
+			cur = cur.R;
 		}
-		return prev;
+		return new Node[] { prev, prevprev };
 	}
 	public Node enque(Person toAdd, Node start) {
 		if (start == null) {
@@ -567,7 +571,7 @@ class BST {
 	public void enque(Person toAdd) {
 		root = enque(toAdd, this.root);
 	}
-	public Node deque(int priority, Node start) {
+	public Node deleteOld(int priority, Node start) {
 		paramsStack stack = new paramsStack(8);
 		stack.push(new Params(0, start));
 		Node result = null;
@@ -625,11 +629,64 @@ class BST {
 		}
 		return result;
 	}
-	public void deque(int priority) {
-		this.root = deque(priority, this.root);
+	public void deleteOld(int priority) {
+		this.root = deleteOld(priority, this.root);
+	}
+	public Node[] findNodeAndParent(final int priority) {
+		Node	parent	= null;
+		Node	cur		= null;
+		for (cur = this.root; cur != null && cur.info.priority != priority;) {
+			parent = cur;
+			if (priority < cur.info.priority) {
+				cur = cur.L;
+			} else {
+				cur = cur.R;
+			}
+		}
+		return new Node[] { cur, parent };
+	}
+
+	public Node delete(final int priority) {
+		Node[]	nodeInfo	= findNodeAndParent(priority);
+		Node	toDel		= nodeInfo[0];
+		Node	parent		= nodeInfo[1];
+		if (toDel == null) {
+			return toDel;
+		}
+		Node replacement = null;
+		if (toDel.L == null || toDel.R == null) {
+			if (toDel.L == null && toDel.R == null) {
+				replacement = null;
+			} else if (toDel.L != null) {
+				replacement = toDel.L;
+			} else {
+				replacement = toDel.R;
+			}
+			if (parent == null) {
+				this.root = replacement;
+			} else if (parent.L != null) {
+				parent.L = replacement;
+			} else {
+				parent.R = replacement;
+			}
+			return toDel;
+		}
+		Node finder = toDel.R;
+		parent = finder;
+		for (finder = toDel.R; finder != null && finder.L != null;) {
+			parent = finder;
+			finder = finder.L;
+		}
+		if (parent == finder) {
+			toDel.R = finder.R;
+		} else {
+			parent.L = finder.R;
+		}
+		toDel.info = finder.R.info;
+
+		return toDel;
 	}
 	public Node dequeMin() {
-
 		if (this.root == null) {
 			return null;
 		}
@@ -647,10 +704,10 @@ class BST {
 		return minPriority;
 	}
 	public Node findMin() {
-		return findMin(this.root);
+		return findMin(this.root)[0];
 	}
 	public Node findMax() {
-		return findMax(this.root);
+		return findMax(this.root)[0];
 	}
 	public Node getNode(int priority) {
 		Node cur = root;
@@ -663,24 +720,24 @@ class BST {
 		}
 		return cur;
 	}
-	private Node findSuccessor(Node n, Node start) {
+	private Node findSuccessor(Node node, Node start) {
 		// Rozni sie od findNext tym, ze szuka nie najblizszy wzgledem korzenia element, ale nastepnika dla danego Node'a
-		if (n.R != null) {
-			return findMin(n.R);
+		if (node.R != null) {
+			return findMin(node.R)[0];
 		}
 		if (start == null) {
 			return null;
 		}
-		Node result = null;
-		for (Node cur = start; cur != null && n.info.priority == cur.info.priority;) {
-			if (n.info.priority < cur.info.priority) {
-				result = cur;
+		Node min = null;
+		for (Node cur = start; cur != null && node.info.priority != cur.info.priority;) {
+			if (node.info.priority < cur.info.priority) {
+				min = cur;
 				cur = cur.L;
 			} else {
 				cur = cur.R;
 			}
 		}
-		return result;
+		return min;
 	}
 	public int getHeight(Node cur) {
 		if (cur == null) {
@@ -728,7 +785,7 @@ public class Source {
 						if (tree.getNode(priority) == null) {
 							result.append(request).append(" ").append(priority).append(": BRAK");
 						}
-						tree.setRoot(tree.deque(priority, tree.getRoot()));
+						tree.setRoot(tree.deleteOld(priority, tree.getRoot()));
 						break;
 					}
 					case "ENQUE": {

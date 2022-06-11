@@ -128,9 +128,18 @@ class BST {
 		this.root = null;
 	}
 	BST(Person[] arr, String orderName) {
-		Order	order	= parseOrder(orderName, arr);
-		Index	idx		= order.getIndex();
-		this.root = order.Create(idx, arr[idx.getIndex()], Integer.MIN_VALUE, Integer.MAX_VALUE);
+		Order order = parseOrder(orderName, arr);
+		// Index	idx		= order;
+		switch (orderName) {
+			case "PREORDER":
+				// index = 0;
+				break;
+			case "POSTORDER":
+				// index = arr.length - 1;
+				break;
+		}
+
+		this.root = order.Create(arr[order.getStartingIndex()], Integer.MIN_VALUE, Integer.MAX_VALUE);
 	}
 	public Order parseOrder(String orderName, Person[] arr) {
 		switch (orderName) {
@@ -160,9 +169,11 @@ class BST {
 
 		Index getIndex();
 
+		int getStartingIndex();
+
 		void setArray(Person[] arr);
 
-		Node Create(Index preIndex, Person data, int MIN, int MAX);
+		Node Create(Person data, int MIN, int MAX);
 
 		public String getString(Node start);
 
@@ -171,9 +182,11 @@ class BST {
 	public class preOrder implements Order {
 		Action act;
 		Person[] arr;
+		int index;
+
 		preOrder(Person[] arr) {
 			this.arr = arr;
-			this.act = new Blank();
+			this.index = 0;
 		}
 		preOrder() {
 
@@ -184,12 +197,15 @@ class BST {
 		public void setArray(Person[] arr) {
 			this.arr = arr;
 		}
-
+		public int getStartingIndex() {
+			this.index = 0;
+			return this.index;
+		}
 		public Index getIndex() {
 			return new Index(0);
 		}
-		public Node Create(Index preIndex, Person data, int MIN, int MAX) {
-			if (preIndex.getIndex() >= arr.length) {
+		public Node Create(Person data, int MIN, int MAX) {
+			if (index >= arr.length) {
 				return null;
 			}
 			if (data.priority <= MIN) {
@@ -199,12 +215,12 @@ class BST {
 				return null;
 			}
 			Node cur = new Node(data);
-			preIndex.next();
-			if (preIndex.getIndex() < arr.length) {
-				cur.L = Create(preIndex, arr[preIndex.getIndex()], MIN, data.priority);
+			index++;
+			if (index < arr.length) {
+				cur.L = Create(arr[index], MIN, data.priority);
 			}
-			if (preIndex.getIndex() < arr.length) {
-				cur.R = Create(preIndex, arr[preIndex.getIndex()], data.priority, MAX);
+			if (index < arr.length) {
+				cur.R = Create(arr[index], data.priority, MAX);
 			}
 			return cur;
 		}
@@ -261,10 +277,13 @@ class BST {
 		public void setArray(Person[] arr) {
 			this.arr = arr;
 		}
+		public int getStartingIndex() {
+			return 0;
+		}
 		public Index getIndex() {
 			return new Index(0);
 		}
-		public Node Create(Index preIndex, Person data, int MIN, int MAX) {
+		public Node Create(Person data, int MIN, int MAX) {
 			throw new IllegalStateException("Undefined");
 		}
 		public String getString(Node start) {
@@ -308,12 +327,14 @@ class BST {
 	public class postOrder implements Order {
 		Action act;
 		Person[] arr;
+		int index;
+
 		postOrder() {
 
 		}
 		postOrder(Person[] arr) {
 			this.arr = arr;
-			this.act = new Blank();
+			index = arr.length - 1;
 		}
 		postOrder(Action action) {
 			this.act = action;
@@ -324,8 +345,12 @@ class BST {
 		public Index getIndex() {
 			return new Index(arr.length - 1);
 		}
-		public Node Create(Index postIndex, Person data, int MIN, int MAX) {
-			if (postIndex.getIndex() >= arr.length) {
+		public int getStartingIndex() {
+			this.index = arr.length - 1;
+			return this.index;
+		}
+		public Node Create(Person data, int MIN, int MAX) {
+			if (index >= arr.length) {
 				return null;
 			}
 			if (data.priority <= MIN) {
@@ -335,12 +360,12 @@ class BST {
 				return null;
 			}
 			Node cur = new Node(data);
-			postIndex.prev();
-			if (postIndex.getIndex() >= 0) {
-				cur.R = Create(postIndex, arr[postIndex.getIndex()], data.priority, MAX);
+			index--;
+			if (index >= 0) {
+				cur.R = Create(arr[index], data.priority, MAX);
 			}
-			if (postIndex.getIndex() >= 0) {
-				cur.L = Create(postIndex, arr[postIndex.getIndex()], MIN, data.priority);
+			if (index >= 0) {
+				cur.L = Create(arr[index], MIN, data.priority);
 			}
 			return cur;
 		}

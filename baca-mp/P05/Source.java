@@ -1,6 +1,5 @@
 import java.util.Scanner;
 import java.util.Stack;
-
 class pParams {
 	private int _adrs;
 	private int _i;
@@ -20,7 +19,6 @@ class pParams {
 		return _requiredCapacity;
 	}
 }
-
 class pParamstack {
 	private pParams[] arr;
 	private int top;
@@ -68,7 +66,6 @@ class pParamstack {
 		return result.toString();
 	}
 }
-
 class Backpack {
 	int[] W;
 	int _capacity;
@@ -135,66 +132,6 @@ class Backpack {
 		}
 		return false;
 	}
-	// public boolean iter_pakuj(int cap, StringBuilder sb) {
-	// 	Stack<Integer> s = new Stack<Integer>();
-	// 	s.push(0);
-	// 	boolean found = false;
-	// 	while (!s.isEmpty() && !found) {
-	// 		int i = s.pop();
-	// 		if (!s.isEmpty() && s.peek() == i) {
-	// 			s.pop();
-	// 			cap += W[i];
-	// 			sb.setLength(sb.length() - 1 - numLength(W[i]));
-	// 			s.push(i + 1);
-	// 		} else {
-	// 			if (cap == 0) { return true; }
-	// 			if (cap < 0) { continue; }
-	// 			if (i >= W.length) { continue; }
-	// 			cap -= W[i];
-	// 			sb.append(" ").append(W[i]);
-	// 			s.push(i);
-	// 			s.push(i);
-	// 			s.push(i + 1);
-	// 		}
-	// 	}
-	// 	return false;
-	// }
-	// public boolean iter_pakuj(int requiredCapacity, StringBuilder sb) {
-	// 	pParamstack		parStack	= new pParamstack(2 * _weights.length + 1);
-	// 	int				i			= 0;
-	// 	Stack<Integer>	s			= new Stack<Integer>();
-	// 	parStack.push(new pParams(0, requiredCapacity, 0));
-	// 	while (parStack.nonEmpty() == true) {
-	// 		pParams curPars = parStack.pop();
-	// 		i = curPars.getCurIndex();
-	// 		requiredCapacity = curPars.getRequiredCapacity();
-	// 		switch (curPars.getAdrs()) {
-	// 			case 0: {
-	// 				if (requiredCapacity == 0) {
-	// 					return true;
-	// 				}
-	// 				if (requiredCapacity < 0) {
-	// 					break;
-	// 				}
-	// 				if (i >= _weights.length) {
-	// 					break;
-	// 				}
-	// 				requiredCapacity -= _weights[i];
-	// 				sb.append(" ").append(_weights[i]);
-	// 				parStack.push(new pParams(1, requiredCapacity, i));
-	// 				parStack.push(new pParams(0, requiredCapacity, i + 1));
-	// 				break;
-	// 			}
-	// 			case 1: {
-	// 				requiredCapacity += _weights[i];
-	// 				sb.setLength(sb.length() - 1 - numLength(_weights[i]));
-	// 				parStack.push(new pParams(0, requiredCapacity, i + 1));
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// 	return false;
-	// }
 	public String PackWeight() {
 		StringBuilder	resultStr	= new StringBuilder("");
 		StringBuilder	sbIter		= new StringBuilder("");
@@ -204,19 +141,15 @@ class Backpack {
 		resultRec = rec_pakuj(0);
 		if (resultRec != false) {
 			resultStr.append("REC:  ").append(this._capacity).append(" =").append(this.sb.toString()).append("\n");
-			// } else {
-			// return "BRAK\n";
 		}
 		resultIter = iter_pakuj(this._capacity, sbIter);
 		if (resultIter != resultRec) {
 			throw new RuntimeException("Wrong result");
 		} else if (resultRec == false) { return "BRAK\n"; }
-
 		resultStr.append("ITER: ").append(this._capacity).append(" =").append(sbIter.toString()).append("\n");
 		return resultStr.toString();
 	}
 }
-
 public class Source {
 	public static Scanner sc = new Scanner(System.in);
 	public static void main(String[] args) {

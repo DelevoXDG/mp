@@ -245,7 +245,7 @@ class Concatenated {
 } // Scanner do wczytywania danych wejsciowych
 
 public class Source {
-	public static Scanner sc = new Scanner(System.in); // Tworzenie obiektu klasy StringBuilder dla sprytnego
+	public static Scanner sc = new Scanner(System.in); 	// Tworzenie obiektu klasy StringBuilder dla sprytnego
 														// dopisywaniaia
 
 	public static void main(String[] args) {

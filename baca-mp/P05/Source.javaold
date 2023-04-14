@@ -1,0 +1,307 @@
+// Maksim Zdobnikau - 2
+
+import java.util.Scanner;
+// Ogolna idea rozwiazania
+
+// Rozwiazanie opiera sie na rekurencyjnym algorytmie problemu Pakowania plecaka, przedstawionym na wykladzie
+// Dla kazhdego elementa sprawdzamy, czy po dodawaniu tego elementa udalo sie wypelnic plecak
+// Dla tego odejmujemy od pojemnosci plecaka wage aktualnego elementa
+// Jezeli udalo, wychodzimy z funkcji
+// Jezeli mamy zbyt mala wage, rekurencyjnie dodajemy nastepnie elementy, sprawdzajac te same warunki
+// Jezeli mam zbyt duza wage, usuwamy aktualny element (dodajemy jego wage do aktualnej pojemnosci), i sprawzamy dla nastepnej wagi
+// Ten algorytm zaimplementowany zostal rekurencyjnie i iteracyjnie
+
+// 1. Funkcja rekurencyjna
+
+// Funkcja rekurencyjna uzywa, zeby uzywac jak najmniej stosu rekurencyjnego, jest w klasie problemu pakowania plecaka, ktory zawiera aktualne stale dane
+// wejsciowe oraz obiekt klasy StringBuilder
+// zatem przekazuje tylko niezbiedne parametry indeksu i aktualnej pojemnosci plecaka
+// Zwraca true, jezeli udalo sie wypelnic plecak, w przeciwnym przypadku zwraca false
+
+// 2. Funkcja iteracyjna
+
+// Funckja uzuwa wlasna stos stanow wywolanej funkcji, czyli (parametry funkcji i miejsce, od ktorego jest wykonywana) == (obiekty typu pParams)
+
+// Zwraca true, jezeli udalo sie wypelnic plecak, w przeciwnym przypadku zwraca false
+
+class pParams {						// Klasa parametrow dla symulacji parametrow wywolania funkcji rekurencyjnej w funkcji iteracyjnej
+	// public static enum Addres { // Zapamietane miejsce w funkcji, do ktorego wchodzimy w symulacji funkcji rekurencyjnej
+	// CALL, // Wywolanie od gory
+	// RESUME // Powrot do stanu po "pierwszym" (w ciale funkcji rekurencyjnej) wywolaniu rekurencyjnym funkcji
+	// // Moglibysmy uzyc trzeci stan po "drugim" (w ciale funkcji rekurencyjnej) wywolaniu rekurencyjnym funkcji
+	// // Ale nie jest potrzebny ten stan, bo w funkcji iteracyjnej zwracamy odrazu "true", jezeli udalo sie wypelnic plecak,
+	// // lub kontynujemy przechodzic po symolacji "wywolan" funkcji rekurencyjnej, poki stos nie jest pusty
+	// // Jezeli jest pusty i nie udalo sie wypelnic plecak, konczy sie petla i zwracamy false - nie udalo sie wypelnic plecak
+	// };
+
+	// private Addres _adrs; // Zapamietane miejsce w funkcji, do ktorego wchodzimy w symulacji funkcji rekurencyjnej
+	private int _adrs;				// Zapamietane miejsce w funkcji, do ktorego wchodzimy w symulacji funkcji rekurencyjnej
+	private int _i;					// Parametr wywolania funkcji: indeks funkcji dla aktualnego wywolania
+	private int _requiredCapacity;	// Parametr wywolania funkcji: aktualna pojemnosc plecaka dla aktualnego wywolania
+
+	public pParams(int adrs, int requiredCapacity, int n) {	// Konstruktor obiektu parametrow wywolania 
+		this._adrs = adrs;
+		this._requiredCapacity = requiredCapacity;
+		this._i = n;
+
+	}
+	// Gettery
+	public int getAdrs() {
+		return _adrs;
+	}
+	public int getCurIndex() {
+		return _i;
+	}
+	public int getRequiredCapacity() {
+		return _requiredCapacity;
+	}
+}
+
+class pParamstack {				// Implementacja stosu typu pParams			
+	private pParams[] arr;		// Tablica, przechowywujacy elementy stosu
+	private int top;			// Aktualny rozmiar stosu
+
+	public pParamstack(final int maxSize) {			// Konstruktor stosu
+		arr = new pParams[maxSize];					// Przyjmuje maksymalny rozmiar stosu
+		top = 0;									// Ustawiamy aktualny rozmiar stosu
+	}
+	public void push(final pParams data) {			// Dodawanie elementow do stosu
+		if (top + 1 >= arr.length) {
+			throw new ArrayIndexOutOfBoundsException("Stack Overflow");
+		}
+		arr[top++] = data;
+	}
+	public pParams pop() {							// Usuwanie elementow ze stosu 
+		if (top - 1 < 0) {
+			throw new ArrayIndexOutOfBoundsException("Stack Underflow");
+		}
+		top--;
+		return arr[top];
+	}
+	public pParams peek() {							// Zwraca gorny element stosu
+		if (top <= 0) {
+			throw new ArrayIndexOutOfBoundsException("Stack is empty");
+		}
+		return arr[top - 1];
+	}
+	public Boolean isEmpty() {					// Funkcja sprawdza, czy stos jest pusty
+		return top == 0;
+	}
+	public Boolean nonEmpty() {					// Funkcja sprawdza, czy stos jest nie pusty
+		return top != 0;
+	}
+	public Boolean isFull() {					// Funkcja sprawdza, czy stos jest wypelniony
+		return top == arr.length;
+	}
+	public int size() {							// Zwraca aktualny rozmiar stosu
+		return top;
+	}
+	@Override public String toString() {		// Zwraca string z elementow stosu
+		StringBuilder result = new StringBuilder("");
+		for (int i = 0; i < top; i++) {
+			result.append(" ").append(arr[i]);
+		}
+		return result.toString();
+	}
+}
+
+class Backpack {			// Klasa plecaka, przechowuje dane, dla ktorego musimy rozwiazac problem Pakowania plecaka
+	int[] _weights;			// Tablica wag elementow
+	int _capacity;			// Pojemnosc plecaka
+	int cap;
+	StringBuilder sb;		// obiekt klasy StringBuilder dla spryrnego zapisywania wynikow funkcji rekurencyjnej 
+	public Backpack(int capacity, int weightCount) {	// Konstrukor
+		// Ustawia dane weijsciowe problemu plecakowego
+		sb = new StringBuilder("");	// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow
+		this._weights = new int[weightCount];
+		this._capacity = capacity;
+		this.cap -= capacity;
+	}
+
+	public void fill(Scanner sc) {						// Wczytuje z wyscia standardowego wagi elementow 
+		for (int i = 0; i < _weights.length; i++) {
+			_weights[i] = sc.nextInt();
+		}
+	}
+	public void print() {								// Wypisuje wszystkie wagi, ktorymi probojemy wypelnic plecak
+		// Funkcja pomocnicza, nie stosujemy jej w rozwiazaniu
+		for (int i = 0; i < _weights.length; i++) {
+			System.out.println(_weights[i]);
+		}
+	}
+	public static int numLength(int num) { 				// Zwraca dlugosc liczby
+		if (num < 10) return 1;
+		if (num < 100) return 2;
+		if (num < 1000) return 3;
+		if (num < 10000) return 4;
+		if (num < 100000) return 5;
+		return 6;
+		// throw new IllegalArgumentException("num should be 10^6");
+	}
+
+	public boolean rec_pakuj(int i) { // Funckaj rekurencyjna
+		// Section CAll
+		if (cap == 0) {		// Sprawdza, czy dla danego wywolania juz mamy dobrze wypelniony plecak
+			return true;			 		// Udalo sie wypelnic plecak
+		}
+		if (cap < 0) {			// Sprawdza, czy dla danego wywolania mamy przepelnenie plecaka
+			return false;					// Nie udalo sie wypelnic plecak
+		}
+		if (i >= _weights.length) { 	// Sprawdzamy, czy juz przeszliszmy po wszystkich wagach dla danego wywolania
+			return false;					// Nie udalo sie wypelnic plecak
+		}
+		cap -= _weights[i];	// Zmniejszamy pojemnosc plecaka o wage aktualnego elementa
+		sb.append(" ").append(_weights[i]);	// Dodajemy do wyniku aktualna wage
+		if (rec_pakuj(i + 1) == true) {	// Jezeli udalo sie wypelnic plecak w wywolaniu funkcji rekurencyjnej nastepnymi wagami
+			return true;					// Udalo sie wypelnic plecak, zwracamy wynik poki nie wyjdziemy z calej funcki rekurencyjnej
+		}
+		// SECTION RESUME 
+		// Nie udalo wypelnic plecak dla danego elementu
+		cap += _weights[i];	// Zwiekszamy pojemnosc plecaka o aktuala wage
+		sb.setLength(sb.length() - 1 - numLength(_weights[i]));	// Usuwanie z wyniku spacji i dodanej aktualnej wagi
+		// Probojemy wypelnic plecak bez aktualnej wagi z nastepna w tablicy waga 
+		return rec_pakuj(i + 1);
+	}
+	public boolean iter_pakuj(int requiredCapacity, StringBuilder sb) {
+		// Symulacja funkcji rekurencyjnej, uzywajaca stos
+		pParamstack	parStack	= new pParamstack(2 * _weights.length + 1);	// Stos, w ktorym pamienamy dane wywolania funkci, i miejsce, do ktorego powinnismy wrocic 
+		int			i			= 0;	// Indeks aktualnie dodawanego elementa
+		parStack.push(new pParams(0, requiredCapacity, 0)); // Dodajemy do stosu stan pierwszego wywolania - wywolania gornego
+		while (parStack.nonEmpty() == true) {	// Pokie stos nie jest pusty, 
+			pParams curPars = parStack.pop();	// Zdejmujemu kolejne parametry wywolania			
+
+			i = curPars.getCurIndex();			// Ustawiamy indeks aktualnego wywolania
+			requiredCapacity = curPars.getRequiredCapacity();	// Ustawiamy pojemnosc plecaka dla aktualnego wywolania
+			switch (curPars.getAdrs()) {		// Sprawdzamy, do ktorego miejsca w funkcji musimy wejsc
+				case 0: {					// Poczatek funkci, zaczynamy od gory "funkcji rekurencyjniej"
+					if (requiredCapacity == 0) {	// Sprawdza, czy dla danego wywolania juz mamy dobrze wypelniony plecak
+						return true;				// Udalo sie wypelnic plecak
+					}
+					if (requiredCapacity < 0) {	// Sprawdza, czy dla danego wywolania mamy przepelnenie plecaka
+						break;					// Nie udalo sie wypelnic plecak
+					}
+					if (i >= _weights.length) {	// Sprawdzamy, czy juz przeszliszmy po wszystkich wagach dla danego wywolania
+						break;							// Nie udalo sie wypelnic plecak
+					}
+					requiredCapacity -= _weights[i];  // Zmniejszamy pojemnosc plecaka o wage aktualnego elementa
+					sb.append(" ").append(_weights[i]);		// Dodajemy do wyniku aktualna wage
+					parStack.push(new pParams(1, requiredCapacity, i));	// Dodajemy do stan aktualnego wywolania funkcji, do ktorego musimy wrocic po "wywolaniu rekurencyjnym"
+					parStack.push(new pParams(0, requiredCapacity, i + 1));	// Wywolanie rekurencyjne
+					break;
+				}
+				case 1: {							// Zaczynamy od miejsca po wywolaniu rekurencyjnym
+					// Nie udalo wypelnic plecak dla danego elementu
+					requiredCapacity += _weights[i];	// Zwiekszamy pojemnosc plecaka o aktuala wage
+					sb.setLength(sb.length() - 1 - numLength(_weights[i]));  // Usuwanie z wyniku spacji i dodanej aktualnej wagi
+					// Probojemy wypelnic plecak bez aktualnej wagi z nastepna w tablicy waga
+					parStack.push(new pParams(0, requiredCapacity, i + 1));
+					break;
+				}
+			}
+		}
+		return false; // Przeszlismy przez wszystkie elementy, nie udalo sie wypelnic plecak
+	}
+	public String PackWeight() {
+		StringBuilder	resultStr	= new StringBuilder("");  	// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow wywolan obu funkcji
+		// StringBuilder	sbRec		= new StringBuilder("");	// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow funkci rekurencyjnej
+		StringBuilder	sbIter		= new StringBuilder("");	// Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow funkci iteracyjnej
+		boolean			resultRec	= false;					// Zmienna: czy udalo sie wypelniec plecak rekurencyjnie
+		boolean			resultIter	= false;					// Zmienna: czy udalo sie wypelniec plecak iteracyjnie
+
+		cap = _capacity;
+		resultRec = rec_pakuj(0);		// "Pakujemy" plecak funkcja rekurencyjna
+		if (resultRec != false) {	// Jezeli udalo sie znalezc wagi, dodajemy do wyniku sformmatowany napis
+			// sbRec = this.sb;
+			resultStr.append("REC:  ").append(this._capacity).append(" =").append(this.sb.toString()).append("\n");
+		} else {	// Jezeli w pierwszej funkcji nie udalo sie wypelnic plecak
+			return "BRAK\n";		// Na pewno juz nie uda sie w drugiej, na wyjscie dodajemy napis "BRAK"
+		}
+		resultIter = iter_pakuj(this._capacity, sbIter);		// "Pakujemy" plecak funkcja iteracyjna
+		// if (resultIter == false && resultRec == false) {		// Jezele w obu funkcjach nie udalo sie wypelnic plecak
+		// 	return "BRAK\n";									// Na wyjscie dodajemy napis "BRAK"
+		// }
+		// if (resultIter != resultRec || sbRec.toString().equals(sbIter.toString()) == false) {
+		// 	// Jezeli dostalismy rozne wyniki z funkcji rekurencyjnej i iteracyjnej, jest jakis blad
+		// 	throw new IllegalStateException("Recursive and iterative functions return different result");
+		// }
+		// Jezeli udalo sie znalezc wagi, dodajemy do wyniku sformmatowany napis
+		resultStr.append("ITER: ").append(this._capacity).append(" =").append(sbIter.toString()).append("\n");
+		return resultStr.toString();	// Zwracamy napis wyniku dla aktualnych danych wejsciowych
+	}
+}
+
+public class Source {
+	public static Scanner sc = new Scanner(System.in);	// Scanner do wczytywania danych wejsciowych
+
+	public static void main(String[] args) {
+		StringBuilder	output		= new StringBuilder();  // Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow kolejnych zestawow testowych
+		int				test_count	= sc.nextInt();			// Liczba zestawow testowych
+
+		while (test_count-- > 0) {	 						// Przechodzimy przez kazdy zestaw
+			String		resultStr	= "";					// Wynik dla altualych danych wejsciowych
+			int			capacity	= sc.nextInt();			// Aktualna pojemnosc plecaka
+			int			weightCount	= sc.nextInt();			// Aktualna liczba wag
+
+			Backpack	backpack	= new Backpack(capacity, weightCount);	// Tworzenie obiektu plecaka o aktualnych danych wejsciowych 
+
+			backpack.fill(sc);	// Wypelniamy aktualny plecak danymi z wejscia standardowego
+			resultStr = backpack.PackWeight();	// Wywolanie funkci wypelniajacej plecak iteracyjnie i rekurencyjnie	
+			output.append(resultStr);			// Zapisyjemy wynik do wyjscia			
+		}
+		System.out.print(output);				// Wypisywanie wyjscia
+	}
+}
+
+// test.00.in
+// 10
+// 10
+// 5
+// 8 7 5 4 1
+// 93
+// 1
+// 93
+// 6
+// 3
+// 3 4 2
+// 20
+// 8
+// 12 4 7 5 1 2 3 4
+// 11
+// 5
+// 4 5 1 5 2
+// 8
+// 2
+// 3 7
+// 30
+// 9
+// 5 6 5 3 6 8 2 4 2
+// 23
+// 10
+// 25 3 7 1 4 9 5 2 1 7
+// 35
+// 3
+// 15 20 15
+// 99
+// 5
+// 11 33 44 55 11
+
+// test.00.out
+// REC:  10 = 5 4 1
+// ITER: 10 = 5 4 1
+// REC:  93 = 93
+// ITER: 93 = 93
+// REC:  6 = 4 2
+// ITER: 6 = 4 2
+// REC:  20 = 12 4 1 3
+// ITER: 20 = 12 4 1 3
+// REC:  11 = 4 5 2
+// ITER: 11 = 4 5 2
+// BRAK
+// REC:  30 = 5 6 5 6 8
+// ITER: 30 = 5 6 5 6 8
+// REC:  23 = 3 7 1 4 5 2 1
+// ITER: 23 = 3 7 1 4 5 2 1
+// REC:  35 = 15 20
+// ITER: 35 = 15 20
+// REC:  99 = 11 33 44 11
+// ITER: 99 = 11 33 44 11

@@ -6,7 +6,8 @@ import java.util.Scanner;
  * Rozwiazania opiera sie na modyfikacji algorytma quicksort, iteracyjnie i bez stosu
  * Dla tego przechodzimy po kolejnych podtablicach ("wywoaliach") quicksort i stosujemy zwykla metode partition
  * dla znalezenia indeksu dla elementa pivot.
- * Przechodzimy po podtablicach od lewej strony i zaznaczamy nastepne przedzialy podczas sortowania, ktore nalezy posortowac je w kolejnych "wywolaniach"
+ * Przechodzimy po podtablicach od lewej strony i zaznaczamy przez przesuwanie najwiekszego elementa z lewej strony na miejsce R nastepne przedzialy podczas
+ * sortowania, ktore nalezy posortowac w kolejnych "wywolaniach"
  *
  * Wyjasnenie zlozonosci
  * Stosujemy algorytm quicksort, ktore dzieli sortowanie podtablicy na podproblemy
@@ -14,7 +15,8 @@ import java.util.Scanner;
  * Partition ma zlozonosc O(n)
  * Uzywamy dodwatkowej petli, zeby przeszukiwac indeksy kolejnej podtablicy, ktora nalezy posortowac
  * Ale 2*O(N) = O(N), O(N*logN + c*logN) = O(N*logN)
- * Zatem mamy zwykla dla algorytma quicksort zlozonosc O(N*logN) */
+ * Zatem mamy zwykla dla algorytma quicksort zlozonosc O(N*logN)
+ * Uzywamy jedynie operacje swapowania, ktora na zalezy od liczby danych wejsciowych */
 
 class Helpers {			// Klasa zaweira funkcje pomocnicze
 	public static <T> void swap(T[] arr, final int A, final int B) {
@@ -27,9 +29,9 @@ class Helpers {			// Klasa zaweira funkcje pomocnicze
 
 class Song {					// Klasa plyty
 	private String[] dataArr;	// Obiekty zawieraja metadane aktualnej plyty
-	private boolean nextR;		// I indykator, czy musimy posortowac podablice [... nextR-1 nextR], konczanca na nextR
 
-	@Override public String toString() {					// Zwraca sformatowane metadane plyty
+	@Override
+	public String toString() {					// Zwraca sformatowane metadane plyty
 		StringBuilder	result	= new StringBuilder(""); 	//Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow
 		int				N		= dataArr.length;			// Ilosc metadanych
 		for (int i = 0; i < N - 1; i++) {
@@ -41,17 +43,8 @@ class Song {					// Klasa plyty
 		return result.toString(); // Zwaracamy wynik
 	}
 
-	public boolean isNextR() {
-		return nextR;			// Zwraca, czy dana plyta jest ostatnia plyta w podtablice, ktora musimy posortowac
-	}
-
-	public void toggleNextR() {	// Odwrocenie stanu indefikatora nextR
-		this.nextR = !this.nextR;
-	}
-
 	Song(final String[] fields) {		// Konstruktor plyty 
 		this.dataArr = fields;	// Ustawenie przekazanych metadanych
-		nextR = false;			// Domyslnie ne musimy sortowac podtablice, ostatnim elementem ktorej jest aktualna plyta 
 	}
 
 	public String getData(final int i) { // Zwraca metadane o podanym indeksie
@@ -69,7 +62,7 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 	private Order order;		// Porzadek, zgodnie z ktorym zostanie posortowana tablica
 	private int sortBy;			// Indkes kolumny, po ktorej musimy posortowac metadane
 
-	private int getMax(int L, int R) {
+	private int findMax(int L, int R) {
 		int max = L + 0;
 
 		for (int i = L + 1; i <= R; i++) {
@@ -98,7 +91,7 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 		this.order = findOrder(orderNo); 	// Znalezenie porzadku dla podanej kolumny i identyfikatora porzadku
 		this.quickSort();					// Wywolanie iteracyjnej funkcji quicksort
 	}
-	private static boolean isNaturalNum(String str) {		// Zwraca, czy napis jest liczba naturalna
+	private static boolean isNaturalNum(final String str) {		// Zwraca, czy napis jest liczba naturalna
 		for (char sym : str.toCharArray()) {
 			if (Character.isDigit(sym) == false) {
 				return false;						// Jezeli jest symbol, ktory nie jest cyfra, to napis nie jest liczba naturalna
@@ -107,7 +100,7 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 		return true;								// Jest liczba naturalna
 	}
 
-	private Order findOrder(int orderNo) {	// Zwraca klase porzadku dla danego typu danych w kolumnie i przekazanego orderNo
+	private Order findOrder(final int orderNo) {	// Zwraca klase porzadku dla danego typu danych w kolumnie i przekazanego orderNo
 		// orderNo == 1 zwykla kolejnosc, orderNo == -1 odwrotna kolejnosc
 		if (songs.length == 0) {			// Sprawzamy, czy kolumna nie jest pusta
 			return null;
@@ -136,14 +129,14 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 	public static interface Order {				// Interface porzadku, zgodnie z ktorym trzeba posortowac metadane
 		public boolean isBigger(String a, String b);
 
-		public boolean isBigger(Song A, Song B, int sortBy);		// Ma funkcje porownywania, rozna dla kazdego porzadku, sprawdza czy metadana o kolumnie sortBy plyty A jest wieksza od metadanej plyty B w sensie porzadku Order
+		public boolean isBigger(final Song A, final Song B, final int sortBy);		// Ma funkcje porownywania, rozna dla kazdego porzadku, sprawdza czy metadana o kolumnie sortBy plyty A jest wieksza od metadanej plyty B w sensie porzadku Order
 	}
 
 	public static class NormalStr implements Order {			// Zwykla kolejnosc, napis
 		public boolean isBigger(String A, String B) {
 			return A.compareTo(B) > 0;
 		}
-		public boolean isBigger(Song A, Song B, int sortBy) {
+		public boolean isBigger(final Song A, final Song B, final int sortBy) {
 			return A.getData(sortBy).compareTo(B.getData(sortBy)) > 0;						// Porownyanie napisow leksykograficznie
 		}
 	}
@@ -152,7 +145,7 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 		public boolean isBigger(String A, String B) {
 			return A.compareTo(B) < 0;
 		}
-		public boolean isBigger(Song A, Song B, int sortBy) {
+		public boolean isBigger(final Song A, final Song B, final int sortBy) {
 			return A.getData(sortBy).compareTo(B.getData(sortBy)) < 0;						// Porownyanie napisow leksykograficznie
 		}
 	}
@@ -160,7 +153,7 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 		public boolean isBigger(String A, String B) {
 			return Integer.parseInt(A) > Integer.parseInt(B);
 		}
-		public boolean isBigger(Song A, Song B, int sortBy) {
+		public boolean isBigger(final Song A, final Song B, final int sortBy) {
 			return Integer.parseInt(A.getData(sortBy)) > Integer.parseInt(B.getData(sortBy));	// Zparsowanie metadanych i porownyanie
 		}
 	}
@@ -168,58 +161,61 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 		public boolean isBigger(String A, String B) {
 			return Integer.parseInt(A) < Integer.parseInt(B);
 		}
-		public boolean isBigger(Song A, Song B, int sortBy) {
+		public boolean isBigger(final Song A, final Song B, final int sortBy) {
 			return Integer.parseInt(A.getData(sortBy)) < Integer.parseInt(B.getData(sortBy));	// Zparsowanie metadanych i porownyanie
 		}
 	}
 
-	public void markR(int k, int q, int R) {
-		Song tmp = songs[k];
-		songs[k] = songs[q - 1];
+	public void markR(int maxLeft, int q, int R) {
+		// Funkcja, ze aktualny indeks R musi byc ostatnim elementem podtablicy w innym "wywolaniu" quicksort 
+		// Cykliczne przesuwamy elementy
+		// songs[R] <- songs[maxLeft] <- songs[q-1] <- songs[q] <- songs[R] 
+		// niech q - indeks pivot po partition, i=q-1, B=R, A - element najwiekszy w podtablice [L ... q -1 ]
+		// <=pivot 	| >= pivot
+		// aaaaaAaaiqbbbBbbb
+		//		^  ^^	^
+		// 		M  iq	R
+
+		// <=pivot 	| >= pivot
+		// aaaaaiaaqBbbbAbbb
+		//	  	^  ^^	^
+		//    	i  qR	M
+		// Wtedy po prawej stronie wszystkie elementy sa >= od q, ale element A jest mniejszy od q
+		// Zatem mozemy latwo znalezc element zaznaczony
+		Song tmp = songs[maxLeft];
+		songs[maxLeft] = songs[q - 1];
 		songs[q - 1] = songs[q];
 		songs[q] = songs[R];
 		songs[R] = tmp;
 	}
-	// public void unmarkR(int k, int q, int R) {
-	// 	Song tmp = songs[R];
-	// 	songs[R] = songs[q];
-	// 	songs[q] = songs[q - 1];
-	// 	songs[q - 1] = songs[k];
-	// 	songs[k] = tmp;
-	// }
 	public void unmarkR(int L, int R) {
+		// niech q - indeks pivot po partition, i=q-1, B=R, A - element najwiekszy w podtablice [L ... q -1 ]
+
+		// <=pivot 	| >= pivot
+		// aaaaaiaaqBbbbAbbb
+		//	  	   ^^	^
+		//    	   qL	M
+
+		// <=pivot 	| >= pivot
+		// aaaaaiaaAqbbbBbbb
+		//	  	   ^^	^
+		//    	   Mq	L
+		// Poniewaz M jest elementem najwiekszym w podtablice [ ... L-1], mozemy postawic jego no ostatnie miejsce przed L-1, ktory w nienaprawionej tablicy jest rowny wartosci pivot
+		// Odpowiednio cycklicznie przesuwamy elementy i tablica po lewej stronie jest posortowana, a po prawej stronie gotowa do stosowania quicksorta 
 		Song tmp = songs[R];
 		songs[R] = songs[L];
 		songs[L] = songs[L - 1];
 		songs[L - 1] = tmp;
 	}
-	private int findR(int L) {		// Szukamy ostatni element podtablicy zaczynajac od R
-		int i = L - 1;			// Zaczynamy od lewego elementa
-		while (++i < songs.length) {
-			if (songs[i].isNextR() == true) { 	// Sprawdzenie czy element o indeksie i jest zaznaczony
-				break;
-			}
-		}
-		// songs[i].toggleNextR();	// Zwracamy indeks i odznaczamy element, podtablica konczaca na i juz zostanie posortowana 
-		return i;
-	}
-	private int findNewR(int L) {		// Szukamy ostatni element podtablicy zaczynajac od R
-		int	i	= L - 1;			// Zaczynamy od lewego elementa
-		int	min	= L;
-		// while (++i < songs.length) {
-		// 	if (order.isBigger(songs[min], songs[i], sortBy)) { 	// Sprawdzenie czy element o indeksie i jest zaznaczony
-		// 		min = i;
-		// 	}
-		// }
-		while (++i < songs.length) {
+	private int findMarkedR(int L) {		// Szukamy ostatni element podtablicy zaczynajac od R
+		int	i	= L - 1;					// Zaczynamy od lewego elementa
+		int	N	= songs.length;
+		while (++i < N) {
 			if (order.isBigger(songs[L - 1], songs[i], sortBy)) { 	// Sprawdzenie czy element o indeksie i jest zaznaczony
-				// min = i;
-				return i;
+				return i;											// Element o indeksie i jest zaznaczony jezeli jest mniejszy od L-1, poniwaz wszystkie pozostale elementy w podtablice musza byc wieksze od L-1
 			}
 		}
-		// swapSongs(min, L);
-		// songs[i].toggleNextR();	// Zwracamy indeks i odznaczamy element, podtablica konczaca na i juz zostanie posortowana 
-		return min;
+		return L;
 	}
 	private void swapSongs(final int A, final int B) {
 		Helpers.swap(this.songs, A, B);		// zamiana elementow o podanych indeksach mejscami w tablicy plyt  
@@ -254,105 +250,45 @@ class musicCollection {			// Klasa reprezentujaca kolekcje plyt Pana Melomana
 			swapSongs(i, min);	// Ustawenie najmniejszego elementu na miejsce i 
 		}
 	}
+	public void quickSort() {	// Implementacja quicksort iteracyjna bez stosu
+		int	toSort	= 1;				// Liczba wywolan quicksort, ktory jeszcze musimy wykonac
 
-	// public void quickSort() {					// Implementacja quicksort iteracyjna bez stosu
-	// 	int	L		= -1;				// Indeks lewego elementa podtablicy aktualnego "wywolania" quickSort 
-	// 	int	R		= songs.length - 1;	// Indeks prawego elementa podtablicy aktualnego "wywolania quickSort" aktualnej  	
-	// 	int	toSort	= 1;				// Liczba wywolan quicksort, ktory jeszcze musimy wykonac
-
-	// 	// songs[R].toggleNextR();		// Zaznaczamy, ze w pierwszym "wywolaniu" trzeba posortowac tablice [L+1 ... N-1]
-	// 	int	min		= getMin(0, R);
-	// 	swapSongs(min, R);
-	// 	do {
-	// 		int curSize = R - L + 1;	// Rozmiar aktualnej podtablicy 
-
-	// 		do {						// Szukamy dane kolejnego "wywolania" quicksort, element lewostronny i prawostronny, O(n)
-	// 			L++;					// Podtablica [0 ... L] jest posortowana
-	// 			R = findR(L);		// Szukamy indeks R kolejnej podtablice [L ... R] dla posortowania
-	// 			toSort--;				// Zmniejszamy liczbe wywolan
-	// 			curSize = R - L + 1;	// Obliczamy aktualny rozmiar tablicy
-	// 		} while (curSize <= 1 && toSort > 0);	// Poki nie znajdziemy tablicy o przynajmnie dwoch elemetnow i nie wykonamy wszystkie wywolania
-
-	// 		if (curSize > 1) {			// Jesli podtablica nie jest jedynym elementym (czyli juz jest posortowana)
-	// 			if (curSize <= 5) {		// S ortujemy selectionSortem podtablice, rozmiar ktorych <= 5
-	// 				selectionSort(L, R);
-	// 				L = R;			// Ustawiamy L na curL, elementy [0 ... L] juz so posortowane
-	// 			} else {
-	// 				while (L < R) {	// Lub juicksortem sortujemy podtablice [L ... R] dla tablicy o rozmiarze > 5
-	// 					int	part	= partition(L, R); 	// Indeks elementu, po po lewej strone ktorego sa mniesze, a po prawej wieksze elementy
-	// 					int	max		= getMax(L, part - 1);
-	// 					// songs[R].toggleNextR();		// Zaznaczamy, ze aktualny R musi byc ostatnim elementem podtablicy w innym "wywolaniu" 
-	// 					markR(max, part, R);		// Zaznaczamy, ze aktualny R musi byc ostatnim elementem podtablicy w innym "wywolaniu" 
-	// 					R = part - 1;				// Ustawiamy podtablice [... ... part-1] jako nastepna dla posortowana quicksortem								
-	// 					toSort++;						// Zwiekszamy ilosc podtablic do posortowania
-	// 				}
-	// 			}
-	// 		}
-	// 	} while (toSort > 0);							// Poki mamy tablice do posortowania
-	// }
-	// public void quickSort() {					// Implementacja quicksort iteracyjna bez stosu
-	// 	int	N	= songs.length;
-	// 	int	L	= -1;				// Indeks lewego elementa podtablicy aktualnego "wywolania" quickSort 
-	// 	int	R	= -1;	// Indeks prawego elementa podtablicy aktualnego "wywolania quickSort" aktualnej  	
-	// 	int	j	= 1;				// Liczba wywolan quicksort, ktory jeszcze musimy wykonac
-
-	// 	songs[N - 1].toggleNextR();		// Zaznaczamy, ze w pierwszym "wywolaniu" trzeba posortowac tablice [L+1 ... N-1]
-	// 	int curSize = R - L + 1;	// Rozmiar aktualnej podtablicy 
-
-	// 	do {						// Szukamy dane kolejnego "wywolania" quicksort, element lewostronny i prawostronny, O(n)
-	// 		L = R + 2;
-	// 		R = L;
-	// 		while (songs[R].isNextR() == false) {
-	// 			R++;
-	// 		}					// Podtablica [0 ... L] jest posortowana
-	// 		songs[R].toggleNextR();
-
-	// 		// R = findR(L);		// Szukamy indeks R kolejnej podtablice [L ... R] dla posortowania
-	// 		// j--;				// Zmniejszamy liczbe wywolan
-	// 		// curSize = R - L + 1;	// Obliczamy aktualny rozmiar tablicy
-
-	// 		while (R - L > 2) {
-	// 			j = partition(L, R);
-	// 			// int max = getMax(L, j - 1);
-	// 			songs[R].toggleNextR();		//
-	// 			// markR(max, j, R);				// Zaznaczamy, ze aktualny R musi byc ostatnim elementem podtablicy w innym "wywolaniu" 
-	// 			R = j - 1;
-	// 		}
-
-	// 		selectionSort(L, R);
-	// 		L = R;
-
-	// 	} while (R != N);
-	// }
-	public void quickSort() {
-
-		int	L	= 0;
-		int	end	= songs.length - 1;
-		int	q, i = 0;
-		int	R	= end;
-		while (true) {
-			i--;
-			while (L < R) {
-				q = partition(L, R);
-				// songs[tmpr].toggleNextR();
-				int max = getMax(L, q - 1);
-				// 			songs[R].toggleNextR();		//
-				markR(max, q, R);
-				R = q - 1;
-				++i;
+		int	R		= songs.length - 1;	// Indeks prawego elementa podtablicy aktualnego "wywolania quickSort" aktualnej  	
+		int	L		= 0;					// Indeks lewego elementa podtablicy aktualnego "wywolania" quickSort
+		do {							// Poczatek petli do while
+			int curSize = R - L + 1;	// Rozmiar podtablicy aktualnego "wywolania" quickSort	
+			while (L < R) {				// Jezeli aktualna podtablica ma wieciej niz jeden elemement
+				curSize = R - L + 1;
+				if (curSize <= 5) {		// Sortujemy SelectionSortem podtablice o rozmiarze <=5
+					selectionSort(L, R);
+					L = R;				// Ustawiamy L na R, elementy [0 ... R] juz so posortowane
+				} else {				// Sortujemy QuickSortem tablice o rozmiarze >5
+					int	part	= partition(L, R);			// Indeks elementu, po po lewej strone ktorego sa mniesze, a po prawej wieksze elementy		 
+					// if (part == 0) {
+					// 	part = partition(L, R);
+					// }
+					int	max		= findMax(L, part - 1);		// Szukamy najwiekszy element w podtablice [L ... part - 1]
+					markR(max, part, R);
+					R = part - 1;							// Ustawiamy podtablice [... ... part-1] jako nastepna dla posortowana quicksortem
+					toSort++;								// Zwiekszamy ilosc podtablic do posortowania
+				}
 			}
-			if (i < 0)
-				break;
-			L++;
-			R = findNewR(L);
-			// songs[R].toggleNextR();
-			// swapSongs(R, L);
-			unmarkR(L, R);
+			boolean found = false;							// Czy udalo sie znalezc nieposortowana podtablice o przynajmniej dwoch elementach 
+			while (found == false && --toSort > 0) {		// Przechodzimy po kolejnych wywolaniach
+				L++;						// Szukamy odpowiednie indeksy podtablicy
+				R = findMarkedR(L);			// Szkamy zaznaczone podtablice (pierwszy element mniejszy od L-1, bo po prawej stronie poza tym elementem musza byc elementy wieksze od L-1)
+				unmarkR(L, R);				// Naprawiamy kolejnosc sortowania, odznaczajac tym samym aktualny indeks r										
 
-		}
+				curSize = R - L + 1;		// Obliczamy rozmiar znaleznionej podtablicy
+				if (curSize > 1) {			// Jezeli podtablica zawiera >= 2 elementy, sortujemy ja w kolejnym "wywolaniu"
+					found = true;			// Wychodzimy z petli
+				}
+			}
+		} while (toSort > 0);	// Petla dziala poki liczba "wywolan" nie jest rowna 0
 	}
 
-	@Override public String toString() {					// Zwraca sformatowany wynik sortowania metdadanych
+	@Override
+	public String toString() {					// Zwraca sformatowany wynik sortowania metdadanych
 		StringBuilder	result	= new StringBuilder(""); 	//Tworzenie obiektu klasy StringBuilder dla sprytnego dopisywania wynikow
 		int				N		= labels.length;
 		for (int i = 0; i < N - 1; i++) {					// Wypisywanie nazw kolumn

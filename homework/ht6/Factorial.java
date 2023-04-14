@@ -9,7 +9,7 @@ public class Factorial {
 		return 1;
 	}
 
-	public static long Fact2(long n, long result) {
+	public static long Fact2(long n, long result) {	// Ogonowa
 		if (n == 0)
 			return result;
 		return Fact2(n - 1, result * n);
